@@ -54,20 +54,25 @@ python pipeline/check_api_key.py
 #    python pipeline/notify_kakao.py authorize-url 부터 새로 발급
 ```
 
-### 자동화 (로컬 launchd — 현재 운영 방식)
+### 자동화 (GitHub Actions + Cloudflare 프록시 — 현재 운영 방식)
 
-⚠️ **GitHub Actions로는 실행 불가**: molit.go.kr이 해외 IP를 차단함 (2026-07-11
-2회 확인, 연결 타임아웃). kyungje-daily가 Actions로 되는 건 MBC RSS·Yahoo가
-해외 접속을 안 막기 때문. 국토부 조회수는 국토부 사이트에만 있어 한국 IP가 필수.
-그래서 정기 실행은 이 맥의 launchd가 담당하고, GitHub은 보고서 호스팅(Pages)에만 사용.
+molit.go.kr은 GitHub 러너(해외 IP)를 차단하지만(연결 타임아웃), Cloudflare
+대역은 막지 않는다 (2026-07-11 검증). 그래서 **Cloudflare Worker를 중계기로
+경유**해 Actions에서 실행한다. 맥이 꺼져 있어도 매주 발행됨.
 
-- 스케줄: `~/Library/LaunchAgents/com.rabbithabbit.molit-weekly.plist`
-  — **토 09:37 KST 발행**, 맥이 꺼져서 놓치면 **일·월 09:37에 자동 따라잡기**
-  (`--weekly-guard`: 최근 5일 내 발행 이력 있으면 skip → 중복 발행 없음)
-- 로그: `out/launchd.log`
-- 잠자기 상태면 깨어날 때 실행됨. 토~월 3일 연속 꺼져 있어야만 그 주를 건너뜀.
-- 맥 의존을 완전히 없애려면: 서울 리전 무료 VM(Oracle Cloud Free Tier 등)에
-  이 저장소를 clone + cron 등록 (한국 IP라 차단 없음)
+```
+GitHub Actions (토 09:37 KST cron) → molit-proxy.rabbit-habbit.workers.dev → molit.go.kr
+```
+
+- **주력**: Actions `weekly.yml` — 토 09:37 (+10:07, 10:47 백업 cron, state 멱등)
+- **프록시**: `proxy-worker/worker.js` — 토큰 인증 + molit.go.kr 전용 + WAF 쿠키 처리.
+  재배포: `cd proxy-worker && npx wrangler deploy` (Cloudflare 계정: rabbit-habbit)
+- **페일오버**: 로컬 launchd(`~/Library/LaunchAgents/com.rabbithabbit.molit-weekly.plist`)가
+  일·월 09:37에 실행 — Actions가 그 주에 발행 성공했으면 `--weekly-guard`가 skip,
+  실패했을 때만 맥이 직접(프록시 없이) 발행. 로그: `out/launchd.log`
+- 프록시 관련 env: `MOLIT_PROXY_URL`(워크플로에 하드코딩),
+  `MOLIT_PROXY_TOKEN`(repo secret + 로컬 `proxy-worker/.proxy_token`, git 제외)
+- Cloudflare가 나중에 차단되면: Actions는 실패하지만 launchd 페일오버가 자동 커버
 
 ```bash
 # 상태 확인 / 수동 실행 / 해제
