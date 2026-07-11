@@ -9,7 +9,6 @@ on:
     - cron: '37 0 * * 6'   # KST 토 09:37 (1차)
     - cron: '7 1 * * 6'    # KST 토 10:07 (백업1)
     - cron: '47 1 * * 6'   # KST 토 10:47 (백업2)
-    - cron: '25 14 * * *'  # ⚠️ 임시 스케줄러 테스트용 — 확인 후 삭제할 것
   workflow_dispatch:
 
 permissions:
