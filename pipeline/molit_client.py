@@ -119,13 +119,21 @@ def fetch_list_page(session: requests.Session, page: int) -> list[PostRow]:
     return rows
 
 
-def scan_pages(session: requests.Session, pages: int) -> list[PostRow]:
-    """1..pages 페이지를 순서대로 스캔."""
+def scan_pages(
+    session: requests.Session, pages: int, min_date: Optional[str] = None
+) -> list[PostRow]:
+    """1..pages 페이지를 순서대로 스캔.
+
+    min_date("YYYY-MM-DD")를 주면, 목록이 최신순이므로 페이지 전체가
+    그보다 오래된 시점에서 스캔을 조기 종료한다 (불필요한 요청 절약).
+    """
     all_rows: list[PostRow] = []
     for p in range(1, pages + 1):
         rows = fetch_list_page(session, p)
         all_rows.extend(rows)
         if not rows:
+            break
+        if min_date and all(r.date < min_date for r in rows):
             break
     return all_rows
 

@@ -47,6 +47,8 @@ PAGES_BASE = "https://rabbit-habbit.github.io/molit-daily"
 DEFAULT_THRESHOLD = int(os.environ.get("VIEW_THRESHOLD", "3000"))
 DEFAULT_PAGES = int(os.environ.get("SCAN_PAGES", "12"))
 DEFAULT_MAX_ITEMS = int(os.environ.get("MAX_ITEMS_PER_RUN", "7"))
+# 등록 후 이 일수를 넘긴 글은 조회수가 기준을 넘어도 싣지 않음 ("이번 주" 컨셉 유지)
+DEFAULT_MAX_AGE_DAYS = int(os.environ.get("MAX_AGE_DAYS", "14"))
 # 의전성 게시물 제외 (조회수가 높아도 정책 실속 없음). 빈 문자열이면 필터 없음.
 EXCLUDE_TITLE_RE = os.environ.get(
     "EXCLUDE_TITLE_RE", r"^\[(장관|차관|위원장)?동정\]|^\[인사\]"
@@ -127,6 +129,7 @@ def run(
     threshold: int = DEFAULT_THRESHOLD,
     pages: int = DEFAULT_PAGES,
     max_items: int = DEFAULT_MAX_ITEMS,
+    max_age_days: int = DEFAULT_MAX_AGE_DAYS,
     push: bool = False,
     dry_run_push: bool = False,
     notify: bool = True,
@@ -134,9 +137,10 @@ def run(
 ) -> dict | None:
     now = _kst_now()
     date_str = now.strftime("%Y-%m-%d")
+    min_date = (now - timedelta(days=max_age_days)).strftime("%Y-%m-%d")
     logger.info(
-        "=== 국토부 위클리 브리핑 (%s, 기준 %s회, %d페이지 스캔) ===",
-        date_str, f"{threshold:,}", pages,
+        "=== 국토부 위클리 브리핑 (%s, 기준 %s회, 최근 %d일: %s~) ===",
+        date_str, f"{threshold:,}", max_age_days, min_date,
     )
     out_dir = ROOT / "out"
     out_dir.mkdir(exist_ok=True)
@@ -144,10 +148,10 @@ def run(
     state = load_state()
     reported: dict = state.setdefault("reported", {})
 
-    # 1) 목록 스캔
+    # 1) 목록 스캔 (min_date보다 오래된 페이지에서 조기 종료)
     logger.info("[1/4] 보도자료 목록 스캔 중...")
     session = molit_client.make_session()
-    rows = molit_client.scan_pages(session, pages)
+    rows = molit_client.scan_pages(session, pages, min_date=min_date)
     if not rows:
         raise RuntimeError("목록을 하나도 읽지 못했습니다 (사이트 구조 변경/차단 의심)")
     max_views = max(r.views for r in rows)
@@ -159,6 +163,7 @@ def run(
         r
         for r in rows
         if r.views >= threshold
+        and r.date >= min_date
         and r.post_id not in reported
         and not (exclude_re and exclude_re.search(r.title))
     ]
@@ -282,6 +287,7 @@ if __name__ == "__main__":
     parser.add_argument("--threshold", type=int, default=DEFAULT_THRESHOLD, help="조회수 기준")
     parser.add_argument("--pages", type=int, default=DEFAULT_PAGES, help="스캔할 목록 페이지 수")
     parser.add_argument("--max-items", type=int, default=DEFAULT_MAX_ITEMS, help="1회 최대 보고 건수")
+    parser.add_argument("--max-age-days", type=int, default=DEFAULT_MAX_AGE_DAYS, help="등록 후 N일 지난 글 제외")
     parser.add_argument("--push", action="store_true", help="git commit + push 실행")
     parser.add_argument("--dry-run-push", action="store_true", help="git 변경사항 확인만")
     parser.add_argument("--no-notify", action="store_true", help="카카오톡 알림 비활성화")
@@ -294,6 +300,7 @@ if __name__ == "__main__":
             threshold=args.threshold,
             pages=args.pages,
             max_items=args.max_items,
+            max_age_days=args.max_age_days,
             push=args.push,
             dry_run_push=args.dry_run_push,
             notify=not args.no_notify,
