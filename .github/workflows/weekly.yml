@@ -1,19 +1,19 @@
-name: MOLIT Daily Brief
+name: MOLIT Weekly Brief
 
 on:
   schedule:
-    # 매일 평일 (월-금) 다중 cron으로 신뢰성 보강.
+    # 매주 토요일 아침 (KST) 다중 cron으로 신뢰성 보강.
     # state/reported.json 기반 멱등 실행 → 중복 보고·중복 비용 없음.
-    - cron: '37 0 * * 1-5'   # KST 09:37 (1차)
-    - cron: '7 1 * * 1-5'    # KST 10:07 (백업1)
-    - cron: '47 1 * * 1-5'   # KST 10:47 (백업2)
+    - cron: '37 0 * * 6'   # KST 토 09:37 (1차)
+    - cron: '7 1 * * 6'    # KST 토 10:07 (백업1)
+    - cron: '47 1 * * 6'   # KST 토 10:47 (백업2)
   workflow_dispatch:
 
 permissions:
   contents: write
 
 concurrency:
-  group: molit-daily
+  group: molit-weekly
   cancel-in-progress: false
 
 jobs:
@@ -30,7 +30,7 @@ jobs:
       # 조회수 기준·스캔 범위 조정은 여기서
       VIEW_THRESHOLD: '3000'
       SCAN_PAGES: '12'
-      MAX_ITEMS_PER_RUN: '5'
+      MAX_ITEMS_PER_RUN: '7'
     steps:
       - name: Checkout
         uses: actions/checkout@v4

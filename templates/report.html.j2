@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>국토부 정책 브리핑 — {{ date_kr }}</title>
+<title>이번 주 핫한 국토부 정책 — {{ date_kr }}</title>
 <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
 <style>
   :root {
@@ -117,10 +117,10 @@
 <body>
 <header>
   <div class="container">
-    <div class="brand">Rabbit Habbit · MOLIT Watch</div>
-    <h1>🏗️ 국토부 정책 브리핑</h1>
+    <div class="brand">Rabbit Habbit · MOLIT Weekly</div>
+    <h1>🏗️ 이번 주 핫한 국토부 정책</h1>
     <div class="header-date">{{ date_kr }}</div>
-    <div class="header-note">조회수 {{ "{:,}".format(threshold) }}회+ 화제 보도자료 {{ items|length }}건</div>
+    <div class="header-note">이번 주 조회수 {{ "{:,}".format(threshold) }}회+ 화제 보도 {{ items|length }}건</div>
   </div>
 </header>
 
@@ -170,7 +170,7 @@
     </article>
     {% endfor %}
     {% else %}
-    <div class="empty">오늘은 조회수 기준을 새로 넘은 보도자료가 없어요 🌿</div>
+    <div class="empty">이번 주엔 조회수 기준을 새로 넘은 보도자료가 없어요 🌿</div>
     {% endif %}
   </div>
 </main>

@@ -217,7 +217,7 @@ def _compose_message(
     date_short = _short_date(date_kr)
     items = report_data.get("items", [])
 
-    header = f"🏗️ 국토부 정책 브리핑\n{date_short} · 화제 보도 {len(items)}건"
+    header = f"🏗️ 이번 주 핫한 국토부 정책\n{date_short} · 화제 보도 {len(items)}건"
     title_lines = []
     for it in items[:3]:
         t = it.get("title", "")

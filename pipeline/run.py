@@ -1,8 +1,9 @@
-"""국토부 정책 브리핑 오케스트레이터.
+"""국토부 위클리 브리핑 오케스트레이터 (매주 토요일 아침 실행).
 
 흐름:
   1) 보도자료 목록 스캔 (최근 SCAN_PAGES 페이지, 조회수 포함)
   2) 조회수 임계값(VIEW_THRESHOLD)을 넘었고 아직 보고 안 한 게시물 선별
+     - [장관동정] 등 의전성 게시물은 EXCLUDE_TITLE_RE로 제외
   3) 각 게시물: 상세 조회 → PDF 다운로드 → Claude 요약
   4) HTML 렌더 (index / latest / archive) + state/reported.json 갱신
   5) (--push) git commit + push
@@ -17,6 +18,7 @@ import argparse
 import json
 import logging
 import os
+import re
 import subprocess
 import sys
 from datetime import datetime, timedelta, timezone
@@ -44,7 +46,11 @@ PAGES_BASE = "https://rabbit-habbit.github.io/molit-daily"
 #  거의 걸리는 게 없으니 VIEW_THRESHOLD로 조정할 것)
 DEFAULT_THRESHOLD = int(os.environ.get("VIEW_THRESHOLD", "3000"))
 DEFAULT_PAGES = int(os.environ.get("SCAN_PAGES", "12"))
-DEFAULT_MAX_ITEMS = int(os.environ.get("MAX_ITEMS_PER_RUN", "5"))
+DEFAULT_MAX_ITEMS = int(os.environ.get("MAX_ITEMS_PER_RUN", "7"))
+# 의전성 게시물 제외 (조회수가 높아도 정책 실속 없음). 빈 문자열이면 필터 없음.
+EXCLUDE_TITLE_RE = os.environ.get(
+    "EXCLUDE_TITLE_RE", r"^\[(장관|차관|위원장)?동정\]|^\[인사\]"
+)
 
 
 def _kst_now() -> datetime:
@@ -119,7 +125,7 @@ def run(
     now = _kst_now()
     date_str = now.strftime("%Y-%m-%d")
     logger.info(
-        "=== 국토부 정책 브리핑 (%s, 기준 %s회, %d페이지 스캔) ===",
+        "=== 국토부 위클리 브리핑 (%s, 기준 %s회, %d페이지 스캔) ===",
         date_str, f"{threshold:,}", pages,
     )
     out_dir = ROOT / "out"
@@ -137,8 +143,15 @@ def run(
     max_views = max(r.views for r in rows)
     logger.info("  ✓ %d건 스캔 (최고 조회수 %s회)", len(rows), f"{max_views:,}")
 
-    # 2) 선별: 임계값 초과 + 미보고
-    candidates = [r for r in rows if r.views >= threshold and r.post_id not in reported]
+    # 2) 선별: 임계값 초과 + 미보고 + 의전성 게시물 제외
+    exclude_re = re.compile(EXCLUDE_TITLE_RE) if EXCLUDE_TITLE_RE else None
+    candidates = [
+        r
+        for r in rows
+        if r.views >= threshold
+        and r.post_id not in reported
+        and not (exclude_re and exclude_re.search(r.title))
+    ]
     candidates.sort(key=lambda r: r.views, reverse=True)
     skipped = len(candidates) - max_items if len(candidates) > max_items else 0
     candidates = candidates[:max_items]

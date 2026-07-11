@@ -1,17 +1,18 @@
 # molit-daily
 
-국토교통부 보도자료 중 **조회수가 임계값을 넘은 화제 정책 보도**를 매일 스크랩·요약하는 자동화 보고서. (kyungje-daily와 같은 구조)
+국토교통부 보도자료 중 **조회수가 임계값을 넘은 화제 정책 보도**를 주 1회 스크랩·요약하는 "이번 주 핫한 국토부 정책" 위클리 브리핑. (kyungje-daily와 같은 구조, 주중 경제 데일리를 보완하는 토요일 발행)
 
-매일 아침 목록을 스캔해 조회수 기준을 새로 넘은 보도자료를 골라, 첨부 PDF를 Claude API로 요약하고 HTML 브리핑을 GitHub Pages로 배포 + 카카오톡 알림.
+매주 토요일 아침 목록을 스캔해 조회수 기준을 새로 넘은 보도자료를 골라, 첨부 PDF를 Claude API로 요약하고 HTML 브리핑을 GitHub Pages로 배포 + 카카오톡 알림.
 
 ## 동작 방식
 
 1. `lst.jsp` 목록 1~12페이지(최근 약 6주) 스캔 — 제목·분야·등록일·**조회수**
 2. `VIEW_THRESHOLD`(기본 3,000회) 이상 & 아직 보고 안 한 게시물 선별
    - 보고 이력은 `state/reported.json`에 기록 → 중복 보고 없음 (멱등)
-   - 1회 최대 `MAX_ITEMS_PER_RUN`(기본 5)건 — 첫 실행 백로그 폭주 방지
+   - `[장관동정]`·`[인사]` 등 의전성 게시물은 `EXCLUDE_TITLE_RE`로 제외
+   - 1회 최대 `MAX_ITEMS_PER_RUN`(기본 7)건 — 첫 실행 백로그 폭주 방지
 3. 상세 페이지에서 담당부서·첨부 PDF 추출 → PDF 다운로드
-4. Claude API로 요약 (핵심 한줄 / 요약 / 핵심 수치 / 영향 / 체크포인트 / 콘텐츠 소재)
+4. Claude API로 요약 (핵심 한줄 / 요약 / 핵심 수치 / 영향 / 체크포인트 / 래빗해빛의 해석)
 5. `docs/index.html` + `docs/archive/{날짜}.html` 렌더 → git push → 카카오톡
 
 > **왜 10,000회가 아니라 3,000회?** 2026-07 기준 최근 6주(120건) 중 조회수
@@ -33,7 +34,7 @@ molit-daily/
 ├── state/reported.json     # 보고 이력 (git 커밋 대상 — Actions 멱등성의 핵심)
 ├── docs/                   # GitHub Pages 루트 (/docs)
 ├── out/                    # 중간 산출물 (git ignore)
-└── .github/workflows/daily.yml
+└── .github/workflows/weekly.yml   # 매주 토요일 아침 (KST) 실행
 ```
 
 ## 셋업 (1회)
@@ -85,7 +86,7 @@ python pipeline/render_report.py --mock           # mock 렌더 미리보기
 ## 비용 (대략)
 
 보도자료 1건 요약 = PDF 1개 입력 (~5-30k tokens) → sonnet 기준 회당 $0.03~0.15.
-주 2~3건 페이스면 **월 $1~2 수준**.
+주 1회 발행 · 회당 2~3건 페이스면 **월 $1~2 수준**.
 
 ## 알려진 이슈
 
@@ -93,7 +94,7 @@ python pipeline/render_report.py --mock           # mock 렌더 미리보기
   `requests.Session`이 자동 처리하지만, WAF 정책이 바뀌면 `molit_client.py` 수정 필요.
 - GitHub Actions 러너는 해외 IP라 정부 사이트가 차단할 가능성 있음.
   차단되면 로컬 cron으로 전환:
-  `37 9 * * 1-5 cd /path/to/molit-daily && .venv/bin/python pipeline/run.py --push`
+  `37 9 * * 6 cd /path/to/molit-daily && .venv/bin/python pipeline/run.py --push`
 - 본문이 hwpx 첨부에만 있고 PDF가 없는 게시물은 제목 기반 축소 요약으로 대체됨.
 - 조회수는 목록 페이지 기준. 스캔 범위(12페이지) 밖으로 밀려난 뒤 임계값을
   넘는 게시물은 놓칠 수 있음 (오래된 글이라 실익 낮음).
