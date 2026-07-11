@@ -159,8 +159,8 @@
       {% if it.summary.action_or_watch %}
       <div class="callout watch"><b class="tag">✅ 체크 포인트</b>{{ it.summary.action_or_watch }}</div>
       {% endif %}
-      {% if it.summary.content_idea %}
-      <div class="callout idea"><b class="tag">🐰 콘텐츠 소재</b>{{ it.summary.content_idea }}</div>
+      {% if it.summary.rabbit_take %}
+      <div class="callout idea"><b class="tag">🐰 래빗해빛의 해석</b>{{ it.summary.rabbit_take }}</div>
       {% endif %}
 
       <div class="links">
@@ -177,7 +177,7 @@
 
 <footer>
   <div class="container">
-    <div>출처: 국토교통부 보도자료 (공공누리 자유이용) · 요약은 AI 생성으로 원문 확인을 권장해요</div>
+    <div>출처: 국토교통부 보도자료 (공공누리 자유이용)</div>
     <div class="scan">최근 {{ scan.posts_scanned }}건 스캔 · 기준 {{ "{:,}".format(threshold) }}회 · 생성 {{ generated_at }}</div>
   </div>
 </footer>
