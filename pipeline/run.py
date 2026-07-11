@@ -51,6 +51,16 @@ DEFAULT_MAX_ITEMS = int(os.environ.get("MAX_ITEMS_PER_RUN", "7"))
 EXCLUDE_TITLE_RE = os.environ.get(
     "EXCLUDE_TITLE_RE", r"^\[(장관|차관|위원장)?동정\]|^\[인사\]"
 )
+# 핵심 관심 주제 — max_items 초과로 잘라낼 때 이 주제가 조회수와 무관하게 우선.
+# (독자가 브리핑을 구독하는 이유: 대출·부동산·공급)
+CORE_TOPIC_RE = re.compile(
+    r"주택|부동산|공급|청약|분양|전세|임대|대출|보증|기금|택지|재건축|재개발"
+    r"|정비사업|미분양|디딤돌|버팀목|공시가"
+)
+
+
+def _is_core(row) -> bool:
+    return bool(CORE_TOPIC_RE.search(row.title) or row.field_name == "주택토지")
 
 
 def _kst_now() -> datetime:
@@ -152,7 +162,8 @@ def run(
         and r.post_id not in reported
         and not (exclude_re and exclude_re.search(r.title))
     ]
-    candidates.sort(key=lambda r: r.views, reverse=True)
+    # 대출·부동산·공급 주제 우선, 그 안에서 조회수 내림차순
+    candidates.sort(key=lambda r: (not _is_core(r), -r.views))
     skipped = len(candidates) - max_items if len(candidates) > max_items else 0
     candidates = candidates[:max_items]
     logger.info(
