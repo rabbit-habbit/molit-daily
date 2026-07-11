@@ -1,0 +1,185 @@
+{# templates/report.html.j2 — 국토부 정책 브리핑 #}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>국토부 정책 브리핑 — {{ date_kr }}</title>
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F7FAF7;
+    --text: #24302A;
+    --text-sub: #64716B;
+    --accent: #1B7A4B;
+    --accent-light: #E8F5EE;
+    --amber: #B45309;
+    --amber-light: #FFF7E6;
+    --border: #E2EAE4;
+    --card: #FFFFFF;
+    --rabbit-orange: #FF6B35;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: 'Pretendard Variable', 'Pretendard', -apple-system, sans-serif;
+    background: var(--bg); color: var(--text); line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+  .container { max-width: 680px; margin: 0 auto; padding: 0 20px; }
+
+  header {
+    background: linear-gradient(135deg, #DCF2E4 0%, #BFE6CE 55%, #A5DBBC 100%);
+    padding: 40px 0 32px; position: relative; overflow: hidden;
+  }
+  header::before {
+    content: '🏗️'; position: absolute; bottom: 28px; right: 56px;
+    font-size: 64px; opacity: 0.25;
+  }
+  header::after {
+    content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 4px;
+    background: linear-gradient(90deg, var(--accent), var(--rabbit-orange));
+  }
+  .brand {
+    font-size: 11px; text-transform: uppercase; letter-spacing: 3px;
+    color: rgba(20,60,40,0.65); font-weight: 600;
+  }
+  h1 { font-size: 24px; font-weight: 800; margin-top: 8px; }
+  .header-date { color: rgba(20,60,40,0.75); font-size: 14px; margin-top: 4px; }
+  .header-note {
+    display:inline-block; margin-top: 14px; padding: 5px 12px;
+    background: rgba(255,255,255,0.65); border-radius: 999px;
+    font-size: 12.5px; color: #1F5138; font-weight: 600;
+  }
+
+  main { padding: 28px 0 12px; }
+
+  .card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 16px; padding: 24px; margin-bottom: 20px;
+    box-shadow: 0 1px 3px rgba(20,48,35,0.05);
+  }
+  .card-meta {
+    display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px;
+    font-size: 12px; color: var(--text-sub);
+  }
+  .chip {
+    padding: 2px 10px; border-radius: 999px; background: var(--accent-light);
+    color: var(--accent); font-weight: 600;
+  }
+  .chip.views { background: var(--amber-light); color: var(--amber); }
+  .chip.plain { background: #F1F4F1; color: var(--text-sub); font-weight: 500; }
+  .card h2 { font-size: 18px; font-weight: 700; line-height: 1.45; }
+  .one-liner {
+    margin-top: 8px; font-size: 14.5px; font-weight: 600; color: var(--accent);
+  }
+  .card p.body-para { margin-top: 12px; font-size: 14.5px; }
+
+  .kp-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 8px; margin-top: 16px;
+  }
+  .kp {
+    background: #F6F9F6; border: 1px solid var(--border); border-radius: 10px;
+    padding: 10px 12px;
+  }
+  .kp .label { font-size: 11.5px; color: var(--text-sub); }
+  .kp .value { font-size: 14px; font-weight: 700; margin-top: 2px; }
+
+  .callout {
+    margin-top: 14px; padding: 12px 14px; border-radius: 10px; font-size: 13.5px;
+  }
+  .callout.who { background: var(--accent-light); }
+  .callout.watch { background: var(--amber-light); }
+  .callout.idea { background: #FFF3EE; }
+  .callout b.tag { display:block; font-size: 12px; margin-bottom: 3px; }
+  .callout.who b.tag { color: var(--accent); }
+  .callout.watch b.tag { color: var(--amber); }
+  .callout.idea b.tag { color: var(--rabbit-orange); }
+
+  .links { margin-top: 16px; font-size: 13px; }
+  .links a {
+    color: var(--accent); font-weight: 600; text-decoration: none;
+    margin-right: 14px;
+  }
+  .links a:hover { text-decoration: underline; }
+
+  .empty {
+    text-align: center; padding: 48px 20px; color: var(--text-sub); font-size: 14px;
+  }
+
+  footer {
+    padding: 20px 0 40px; text-align: center;
+    font-size: 12px; color: var(--text-sub);
+  }
+  footer .scan { margin-top: 4px; font-size: 11.5px; }
+</style>
+</head>
+<body>
+<header>
+  <div class="container">
+    <div class="brand">Rabbit Habbit · MOLIT Watch</div>
+    <h1>🏗️ 국토부 정책 브리핑</h1>
+    <div class="header-date">{{ date_kr }}</div>
+    <div class="header-note">조회수 {{ "{:,}".format(threshold) }}회+ 화제 보도자료 {{ items|length }}건</div>
+  </div>
+</header>
+
+<main>
+  <div class="container">
+    {% if items %}
+    {% for it in items %}
+    <article class="card">
+      <div class="card-meta">
+        <span class="chip">{{ it.field_name or "국토부" }}</span>
+        <span class="chip views">조회 {{ "{:,}".format(it.views) }}회</span>
+        {% if it.department %}<span class="chip plain">{{ it.department }}</span>{% endif %}
+        <span class="chip plain">{{ it.date }}</span>
+      </div>
+      <h2>{{ it.title }}</h2>
+      {% if it.summary.one_liner %}<div class="one-liner">{{ it.summary.one_liner }}</div>{% endif %}
+
+      {% for para in it.summary.summary %}
+      <p class="body-para">{{ para }}</p>
+      {% endfor %}
+
+      {% if it.summary.key_points %}
+      <div class="kp-grid">
+        {% for kp in it.summary.key_points %}
+        <div class="kp">
+          <div class="label">{{ kp.label }}</div>
+          <div class="value">{{ kp.value }}</div>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      {% if it.summary.who_affected %}
+      <div class="callout who"><b class="tag">👥 누구에게 영향?</b>{{ it.summary.who_affected }}</div>
+      {% endif %}
+      {% if it.summary.action_or_watch %}
+      <div class="callout watch"><b class="tag">✅ 체크 포인트</b>{{ it.summary.action_or_watch }}</div>
+      {% endif %}
+      {% if it.summary.content_idea %}
+      <div class="callout idea"><b class="tag">🐰 콘텐츠 소재</b>{{ it.summary.content_idea }}</div>
+      {% endif %}
+
+      <div class="links">
+        <a href="{{ it.url }}" target="_blank" rel="noopener">원문 보기 →</a>
+        {% if it.pdf_url %}<a href="{{ it.pdf_url }}" target="_blank" rel="noopener">PDF 첨부 ↓</a>{% endif %}
+      </div>
+    </article>
+    {% endfor %}
+    {% else %}
+    <div class="empty">오늘은 조회수 기준을 새로 넘은 보도자료가 없어요 🌿</div>
+    {% endif %}
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    <div>출처: 국토교통부 보도자료 (공공누리 자유이용) · 요약은 AI 생성으로 원문 확인을 권장해요</div>
+    <div class="scan">최근 {{ scan.posts_scanned }}건 스캔 · 기준 {{ "{:,}".format(threshold) }}회 · 생성 {{ generated_at }}</div>
+  </div>
+</footer>
+</body>
+</html>

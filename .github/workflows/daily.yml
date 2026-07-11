@@ -1,0 +1,63 @@
+name: MOLIT Daily Brief
+
+on:
+  schedule:
+    # 매일 평일 (월-금) 다중 cron으로 신뢰성 보강.
+    # state/reported.json 기반 멱등 실행 → 중복 보고·중복 비용 없음.
+    - cron: '37 0 * * 1-5'   # KST 09:37 (1차)
+    - cron: '7 1 * * 1-5'    # KST 10:07 (백업1)
+    - cron: '47 1 * * 1-5'   # KST 10:47 (백업2)
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: molit-daily
+  cancel-in-progress: false
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      TZ: Asia/Seoul
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      ANTHROPIC_MODEL: claude-sonnet-4-6
+      KAKAO_REST_API_KEY: ${{ secrets.KAKAO_REST_API_KEY }}
+      KAKAO_CLIENT_SECRET: ${{ secrets.KAKAO_CLIENT_SECRET }}
+      KAKAO_REFRESH_TOKEN: ${{ secrets.KAKAO_REFRESH_TOKEN }}
+      # 조회수 기준·스캔 범위 조정은 여기서
+      VIEW_THRESHOLD: '3000'
+      SCAN_PAGES: '12'
+      MAX_ITEMS_PER_RUN: '5'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Run pipeline (scan → select → PDF → Claude → render → push)
+        run: python pipeline/run.py --push
+
+      - name: Upload intermediate JSONs as artifact (on failure)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pipeline-debug-${{ github.run_id }}
+          path: out/
+          if-no-files-found: ignore
