@@ -146,6 +146,12 @@ def run(
     out_dir = ROOT / "out"
     out_dir.mkdir(exist_ok=True)
 
+    # Actions와 로컬이 번갈아 커밋해도 어긋나지 않도록 실행 전 동기화
+    if push:
+        pull = _git(["pull", "--rebase", "--autostash"])
+        if pull.returncode != 0:
+            logger.warning("git pull 실패 (계속 진행): %s", pull.stderr.strip())
+
     state = load_state()
     reported: dict = state.setdefault("reported", {})
 

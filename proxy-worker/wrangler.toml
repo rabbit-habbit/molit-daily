@@ -1,0 +1,6 @@
+name = "molit-proxy"
+main = "worker.js"
+compatibility_date = "2026-07-01"
+
+# 배포: cd proxy-worker && npx wrangler deploy
+# 토큰 등록: npx wrangler secret put PROXY_TOKEN

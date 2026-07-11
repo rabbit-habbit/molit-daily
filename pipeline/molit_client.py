@@ -13,11 +13,12 @@ from __future__ import annotations
 
 import html as html_mod
 import logging
+import os
 import re
 import time
 from dataclasses import dataclass, field
 from typing import Optional
-from urllib.parse import parse_qs, urlparse
+from urllib.parse import parse_qs, urlencode, urlparse
 
 import requests
 from bs4 import BeautifulSoup
@@ -76,9 +77,26 @@ def make_session() -> requests.Session:
     return s
 
 
-def _get(session: requests.Session, url: str, **kwargs) -> requests.Response:
+def _get(
+    session: requests.Session, url: str, params: Optional[dict] = None
+) -> requests.Response:
+    """molit.go.kr GET.
+
+    MOLIT_PROXY_URL이 설정돼 있으면 Cloudflare Worker를 경유한다
+    (GitHub Actions 등 국토부가 차단하는 해외 IP 환경용). 로컬에서는 직접 접속.
+    """
     time.sleep(REQUEST_DELAY)
-    r = session.get(url, timeout=30, **kwargs)
+    proxy_url = os.environ.get("MOLIT_PROXY_URL", "").rstrip("/")
+    if proxy_url:
+        full = url + (f"?{urlencode(params)}" if params else "")
+        r = session.get(
+            proxy_url + "/",
+            params={"url": full},
+            headers={"x-proxy-token": os.environ.get("MOLIT_PROXY_TOKEN", "")},
+            timeout=60,
+        )
+    else:
+        r = session.get(url, params=params, timeout=30)
     r.raise_for_status()
     return r
 
