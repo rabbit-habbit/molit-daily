@@ -130,6 +130,7 @@ def run(
     pages: int = DEFAULT_PAGES,
     max_items: int = DEFAULT_MAX_ITEMS,
     max_age_days: int = DEFAULT_MAX_AGE_DAYS,
+    weekly_guard: bool = False,
     push: bool = False,
     dry_run_push: bool = False,
     notify: bool = True,
@@ -147,6 +148,15 @@ def run(
 
     state = load_state()
     reported: dict = state.setdefault("reported", {})
+
+    # 주간 가드: 최근 5일 내 발행했으면 skip (일/월 백업 스케줄이 중복 발행 안 하도록)
+    if weekly_guard and state.get("last_published"):
+        last_pub = datetime.fromisoformat(state["last_published"])
+        if (now - last_pub).days < 5:
+            logger.info(
+                "이번 주(%s) 이미 발행됨 — 백업 실행 skip", last_pub.strftime("%m/%d")
+            )
+            return None
 
     # 1) 목록 스캔 (min_date보다 오래된 페이지에서 조기 종료)
     logger.info("[1/4] 보도자료 목록 스캔 중...")
@@ -261,6 +271,7 @@ def run(
             "reported_on": date_str,
         }
     state["last_run"] = now.isoformat()
+    state["last_published"] = now.isoformat()
     save_state(state)
 
     # 5) git
@@ -288,6 +299,7 @@ if __name__ == "__main__":
     parser.add_argument("--pages", type=int, default=DEFAULT_PAGES, help="스캔할 목록 페이지 수")
     parser.add_argument("--max-items", type=int, default=DEFAULT_MAX_ITEMS, help="1회 최대 보고 건수")
     parser.add_argument("--max-age-days", type=int, default=DEFAULT_MAX_AGE_DAYS, help="등록 후 N일 지난 글 제외")
+    parser.add_argument("--weekly-guard", action="store_true", help="최근 5일 내 발행했으면 skip (백업 스케줄용)")
     parser.add_argument("--push", action="store_true", help="git commit + push 실행")
     parser.add_argument("--dry-run-push", action="store_true", help="git 변경사항 확인만")
     parser.add_argument("--no-notify", action="store_true", help="카카오톡 알림 비활성화")
@@ -301,6 +313,7 @@ if __name__ == "__main__":
             pages=args.pages,
             max_items=args.max_items,
             max_age_days=args.max_age_days,
+            weekly_guard=args.weekly_guard,
             push=args.push,
             dry_run_push=args.dry_run_push,
             notify=not args.no_notify,

@@ -57,13 +57,17 @@ python pipeline/check_api_key.py
 ### 자동화 (로컬 launchd — 현재 운영 방식)
 
 ⚠️ **GitHub Actions로는 실행 불가**: molit.go.kr이 해외 IP를 차단함 (2026-07-11
-확인, 연결 타임아웃). 그래서 정기 실행은 이 맥의 launchd가 담당하고, GitHub은
-보고서 호스팅(Pages)에만 사용.
+2회 확인, 연결 타임아웃). kyungje-daily가 Actions로 되는 건 MBC RSS·Yahoo가
+해외 접속을 안 막기 때문. 국토부 조회수는 국토부 사이트에만 있어 한국 IP가 필수.
+그래서 정기 실행은 이 맥의 launchd가 담당하고, GitHub은 보고서 호스팅(Pages)에만 사용.
 
 - 스케줄: `~/Library/LaunchAgents/com.rabbithabbit.molit-weekly.plist`
-  — **매주 토요일 09:37 KST** `pipeline/run.py --push` 실행
+  — **토 09:37 KST 발행**, 맥이 꺼져서 놓치면 **일·월 09:37에 자동 따라잡기**
+  (`--weekly-guard`: 최근 5일 내 발행 이력 있으면 skip → 중복 발행 없음)
 - 로그: `out/launchd.log`
-- 토요일 아침에 맥이 잠자기 상태면 깨어날 때 실행됨 (전원 꺼짐이면 그 주는 skip)
+- 잠자기 상태면 깨어날 때 실행됨. 토~월 3일 연속 꺼져 있어야만 그 주를 건너뜀.
+- 맥 의존을 완전히 없애려면: 서울 리전 무료 VM(Oracle Cloud Free Tier 등)에
+  이 저장소를 clone + cron 등록 (한국 IP라 차단 없음)
 
 ```bash
 # 상태 확인 / 수동 실행 / 해제
