@@ -54,19 +54,31 @@ python pipeline/check_api_key.py
 #    python pipeline/notify_kakao.py authorize-url 부터 새로 발급
 ```
 
-### GitHub 배포 (자동화)
+### 자동화 (로컬 launchd — 현재 운영 방식)
+
+⚠️ **GitHub Actions로는 실행 불가**: molit.go.kr이 해외 IP를 차단함 (2026-07-11
+확인, 연결 타임아웃). 그래서 정기 실행은 이 맥의 launchd가 담당하고, GitHub은
+보고서 호스팅(Pages)에만 사용.
+
+- 스케줄: `~/Library/LaunchAgents/com.rabbithabbit.molit-weekly.plist`
+  — **매주 토요일 09:37 KST** `pipeline/run.py --push` 실행
+- 로그: `out/launchd.log`
+- 토요일 아침에 맥이 잠자기 상태면 깨어날 때 실행됨 (전원 꺼짐이면 그 주는 skip)
 
 ```bash
-gh repo create molit-daily --public --source . --push
-gh secret set ANTHROPIC_API_KEY
-gh secret set KAKAO_REST_API_KEY
-gh secret set KAKAO_CLIENT_SECRET
-gh secret set KAKAO_REFRESH_TOKEN   # .kakao_tokens.json의 refresh_token 값
+# 상태 확인 / 수동 실행 / 해제
+launchctl list | grep molit
+launchctl kickstart gui/$(id -u)/com.rabbithabbit.molit-weekly
+launchctl bootout gui/$(id -u)/com.rabbithabbit.molit-weekly
 ```
 
-- Settings → Pages에서 `Branch: main / Folder: /docs` 활성화
-- URL: https://rabbit-habbit.github.io/molit-daily/
+### GitHub Pages (호스팅)
+
+- 저장소: https://github.com/rabbit-habbit/molit-daily (Pages: `main` / `/docs`)
+- 보고서 URL: https://rabbit-habbit.github.io/molit-daily/
 - 계정/저장소 이름이 다르면 `pipeline/run.py`의 `PAGES_BASE` 수정
+- Actions의 `MOLIT Weekly Brief` 워크플로는 수동 재시도용으로만 남아 있음
+  (스케줄 없음, 해외 IP 차단으로 실패함)
 
 ## 사용
 

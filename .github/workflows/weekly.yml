@@ -1,12 +1,10 @@
 name: MOLIT Weekly Brief
 
+# ⚠️ 주의: molit.go.kr이 GitHub Actions 러너(해외 IP)의 접속을 차단함
+# (2026-07-11 확인: 연결 타임아웃). 정기 실행은 로컬 launchd가 담당하고
+# (~/Library/LaunchAgents/com.rabbithabbit.molit-weekly.plist, 토 09:37 KST)
+# 이 워크플로는 수동 재시도용으로만 남겨둠. README '자동화' 섹션 참고.
 on:
-  schedule:
-    # 매주 토요일 아침 (KST) 다중 cron으로 신뢰성 보강.
-    # state/reported.json 기반 멱등 실행 → 중복 보고·중복 비용 없음.
-    - cron: '37 0 * * 6'   # KST 토 09:37 (1차)
-    - cron: '7 1 * * 6'    # KST 토 10:07 (백업1)
-    - cron: '47 1 * * 6'   # KST 토 10:47 (백업2)
   workflow_dispatch:
 
 permissions:
