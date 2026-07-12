@@ -40,8 +40,8 @@
     background: linear-gradient(90deg, var(--accent), var(--rabbit-orange));
   }
   .brand {
-    font-size: 11px; text-transform: uppercase; letter-spacing: 3px;
-    color: rgba(20,60,40,0.65); font-weight: 600;
+    font-size: 12.5px; letter-spacing: 0.5px;
+    color: rgba(20,60,40,0.7); font-weight: 700;
   }
   h1 { font-size: 24px; font-weight: 800; margin-top: 8px; }
   .header-date { color: rgba(20,60,40,0.75); font-size: 14px; margin-top: 4px; }
@@ -122,7 +122,7 @@
 <body>
 <header>
   <div class="container">
-    <div class="brand">Rabbit Habbit · MOLIT Weekly</div>
+    <div class="brand">햇님이들을 위한 이번주 정책 브리핑</div>
     <h1>🏗️ 이번 주 핫한 국토부 정책</h1>
     <div class="header-date">{{ date_kr }}</div>
     <div class="header-note">이번 주 조회수 {{ "{:,}".format(threshold) }}회+ 화제 보도 {{ items|length }}건</div>
