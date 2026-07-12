@@ -16,8 +16,8 @@
                 "views": 5217,
                 "url": "https://...dtl.jsp?...",
                 "pdf_url": "https://...DownloadMltm2.jsp?...",  # 없으면 None
-                "summary": {one_liner, summary[], key_points[], who_affected,
-                            action_or_watch, rabbit_take},
+                "summary": {one_liner, summary[], key_points[],
+                            rabbit_take, check_in_source},
             },
         ],
         "generated_at": "2026-07-11 09:40 KST",
@@ -87,9 +87,8 @@ def mock_data() -> dict:
                         {"label": "협약 기관", "value": "국토지리정보원·경남도"},
                         {"label": "대상", "value": "반세기 전 항공사진"},
                     ],
-                    "who_affected": "토지 경계 분쟁·상속 문제로 과거 지형 확인이 필요한 분들에게 유용해요.",
-                    "action_or_watch": "온라인 열람 서비스 오픈 시점을 확인해보세요.",
-                    "rabbit_take": "과거 지형 자료가 디지털로 풀리면 토지 이력 확인이 훨씬 쉬워져요. 오래된 땅 상속·매매를 앞둔 분들에겐 실질적인 도움이 되는 변화예요.",
+                    "rabbit_take": "과거 지형 자료가 디지털로 풀리면 토지 이력 확인이 훨씬 쉬워져요.",
+                    "check_in_source": "온라인 열람 서비스 오픈 시점과 대상 지역 목록",
                 },
             }
         ],

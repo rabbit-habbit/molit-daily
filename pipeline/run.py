@@ -250,6 +250,28 @@ def run(
         logger.warning("요약에 성공한 건이 없음 — 종료 (state 미변경, 다음 실행에서 재시도)")
         return None
 
+    # 같은 날 이미 발행한 항목이 있으면 합쳐서 렌더 (재시도·추가 실행 시 덮어쓰기 방지)
+    prev_path = out_dir / "report_data.json"
+    if prev_path.exists():
+        try:
+            prev = json.loads(prev_path.read_text(encoding="utf-8"))
+            if prev.get("date") == date_str:
+                new_ids = {it["post_id"] for it in items}
+                carried = [
+                    it for it in prev.get("items", []) if it["post_id"] not in new_ids
+                ]
+                if carried:
+                    logger.info("  기존 오늘자 %d건과 병합", len(carried))
+                    items = carried + items
+        except (json.JSONDecodeError, KeyError):
+            pass
+    items.sort(
+        key=lambda it: (
+            not (CORE_TOPIC_RE.search(it["title"]) or it["field_name"] == "주택토지"),
+            -it["views"],
+        )
+    )
+
     # 4) 렌더 + state 갱신
     logger.info("[4/4] HTML 렌더 + state 갱신...")
     report_data = {

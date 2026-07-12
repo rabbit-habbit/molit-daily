@@ -53,6 +53,15 @@
 
   main { padding: 28px 0 12px; }
 
+  .intro {
+    background: var(--card); border: 1.5px solid var(--accent);
+    border-radius: 16px; padding: 20px 22px; margin-bottom: 24px;
+    font-size: 14px;
+  }
+  .intro .intro-title { font-weight: 800; font-size: 15px; margin-bottom: 8px; }
+  .intro p { margin-top: 6px; }
+  .intro .highlight { color: var(--accent); font-weight: 700; }
+
   .card {
     background: var(--card); border: 1px solid var(--border);
     border-radius: 16px; padding: 24px; margin-bottom: 20px;
@@ -88,20 +97,26 @@
   .callout {
     margin-top: 14px; padding: 12px 14px; border-radius: 10px; font-size: 13.5px;
   }
-  .callout.who { background: var(--accent-light); }
-  .callout.watch { background: var(--amber-light); }
   .callout.idea { background: #FFF3EE; }
   .callout b.tag { display:block; font-size: 12px; margin-bottom: 3px; }
-  .callout.who b.tag { color: var(--accent); }
-  .callout.watch b.tag { color: var(--amber); }
   .callout.idea b.tag { color: var(--rabbit-orange); }
 
-  .links { margin-top: 16px; font-size: 13px; }
-  .links a {
-    color: var(--accent); font-weight: 600; text-decoration: none;
-    margin-right: 14px;
+  .check-line {
+    margin-top: 12px; font-size: 13px; color: var(--amber);
   }
-  .links a:hover { text-decoration: underline; }
+  .check-line b { font-weight: 700; }
+
+  .cta-row { margin-top: 16px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .cta {
+    display: inline-block; padding: 10px 18px; border-radius: 10px;
+    background: var(--accent); color: #fff !important; font-weight: 700;
+    font-size: 14px; text-decoration: none;
+  }
+  .cta:hover { opacity: 0.9; }
+  .cta-sub {
+    font-size: 13px; color: var(--text-sub); text-decoration: none; font-weight: 600;
+  }
+  .cta-sub:hover { text-decoration: underline; }
 
   .empty {
     text-align: center; padding: 48px 20px; color: var(--text-sub); font-size: 14px;
@@ -131,6 +146,11 @@
 
 <main>
   <div class="container">
+    <div class="intro">
+      <div class="intro-title">🐰 시작 전에, 햇님이들!</div>
+      <p>래빗해빛이 강의 때마다 강조하는 거 기억하시죠? <span class="highlight">"정책은 꼭 원문으로 확인하세요."</span> 기사 한 줄, 요약 한 장으로는 내 상황에 맞는 조건이나 예외가 안 보이거든요.</p>
+      <p>그래서 이 브리핑은 정답지가 아니라 <b>지도</b>예요. 아래에서 가닥만 잡고, 끌리는 소식은 <span class="highlight">[원문 읽기] 버튼으로 바로 국토부 보도자료를 직접</span> 보실 수 있어요 📄</p>
+    </div>
     {% if items %}
     {% for it in items %}
     <article class="card">
@@ -158,19 +178,16 @@
       </div>
       {% endif %}
 
-      {% if it.summary.who_affected %}
-      <div class="callout who"><b class="tag">👥 누구에게 영향?</b>{{ it.summary.who_affected }}</div>
-      {% endif %}
-      {% if it.summary.action_or_watch %}
-      <div class="callout watch"><b class="tag">✅ 체크 포인트</b>{{ it.summary.action_or_watch }}</div>
-      {% endif %}
       {% if it.summary.rabbit_take %}
       <div class="callout idea"><b class="tag">🐰 래빗해빛 해석</b>{{ it.summary.rabbit_take }}</div>
       {% endif %}
+      {% if it.summary.check_in_source %}
+      <div class="check-line">📌 <b>원문에서 확인!</b> {{ it.summary.check_in_source }}</div>
+      {% endif %}
 
-      <div class="links">
-        <a href="{{ it.url }}" target="_blank" rel="noopener">원문 보기 →</a>
-        {% if it.pdf_url %}<a href="{{ it.pdf_url }}" target="_blank" rel="noopener">PDF 첨부 ↓</a>{% endif %}
+      <div class="cta-row">
+        <a class="cta" href="{{ it.url }}" target="_blank" rel="noopener">📄 원문 읽기</a>
+        {% if it.pdf_url %}<a class="cta-sub" href="{{ it.pdf_url }}" target="_blank" rel="noopener">PDF 내려받기 ↓</a>{% endif %}
       </div>
     </article>
     {% endfor %}

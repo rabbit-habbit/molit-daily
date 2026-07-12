@@ -34,7 +34,7 @@ UA = (
     "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36"
 )
 
-REQUEST_DELAY = 0.5  # 정부 사이트 예의상 요청 간격 (초)
+REQUEST_DELAY = 1.0  # 정부 사이트 예의상 요청 간격 (초)
 MAX_PDF_BYTES = 30 * 1024 * 1024  # Claude PDF 입력 한도(32MB)보다 약간 작게
 
 
