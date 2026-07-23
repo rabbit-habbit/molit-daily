@@ -20,6 +20,27 @@ const UA =
   "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) " +
   "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36";
 
+// GitHub Actions cron은 수 시간씩 지연되는 best-effort라, 정시 발행은
+// Cloudflare Cron Trigger(분 단위 정확)가 담당한다: 토 09:37 KST에
+// GitHub API로 weekly.yml 워크플로를 직접 깨운다. GH_TOKEN 시크릿 필요
+// (fine-grained PAT, molit-daily 저장소 Actions read/write 전용).
+async function dispatchWorkflow(env) {
+  const r = await fetch(
+    "https://api.github.com/repos/rabbit-habbit/molit-daily/actions/workflows/weekly.yml/dispatches",
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${env.GH_TOKEN}`,
+        Accept: "application/vnd.github+json",
+        "User-Agent": "molit-proxy-cron",
+        "X-GitHub-Api-Version": "2022-11-28",
+      },
+      body: JSON.stringify({ ref: "main" }),
+    }
+  );
+  return r; // 성공 시 204 No Content
+}
+
 function setCookies(resp) {
   if (typeof resp.headers.getSetCookie === "function") {
     return resp.headers.getSetCookie();
@@ -29,6 +50,14 @@ function setCookies(resp) {
 }
 
 export default {
+  // Cloudflare Cron Trigger (wrangler.toml [triggers]) — 토 09:37 KST 정각
+  async scheduled(event, env, ctx) {
+    const r = await dispatchWorkflow(env);
+    if (r.status !== 204) {
+      console.log("workflow dispatch 실패:", r.status, await r.text());
+    }
+  },
+
   async fetch(request, env) {
     if (request.method !== "GET") {
       return new Response("method not allowed", { status: 405 });
@@ -36,7 +65,14 @@ export default {
     if (request.headers.get("x-proxy-token") !== env.PROXY_TOKEN) {
       return new Response("forbidden", { status: 403 });
     }
-    const target = new URL(request.url).searchParams.get("url");
+    const reqUrl = new URL(request.url);
+    // 크론 디스패치 수동 테스트용 (프록시 토큰 인증 후)
+    if (reqUrl.pathname === "/cron-test") {
+      const r = await dispatchWorkflow(env);
+      const body = r.status === 204 ? "dispatched" : await r.text();
+      return new Response(`${r.status} ${body}`, { status: 200 });
+    }
+    const target = reqUrl.searchParams.get("url");
     if (!target) {
       return new Response("missing ?url=", { status: 400 });
     }
