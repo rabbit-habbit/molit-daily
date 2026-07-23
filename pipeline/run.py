@@ -29,7 +29,7 @@ from dotenv import load_dotenv
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from pipeline import molit_client, notify_kakao, render_report  # noqa: E402
+from pipeline import molit_client, notify_email, notify_kakao, render_report  # noqa: E402
 from pipeline import summarize as sm  # noqa: E402
 
 load_dotenv(override=True)
@@ -316,6 +316,18 @@ def run(
             logger.info("  ✓ 카카오톡 알림 완료")
         except Exception as exc:
             logger.warning("  ⚠️  카카오톡 알림 실패 (보고서 자체는 정상): %s", exc)
+
+    # 7) 뉴스레터 이메일 (설정된 경우만, best-effort)
+    if notify and os.environ.get("NEWSLETTER_SHEET_CSV_URL"):
+        url = f"{PAGES_BASE}/archive/{date_str}.html"
+        logger.info("[email] 뉴스레터 발송 중...")
+        try:
+            result = notify_email.send_newsletter(report_data, url)
+            logger.info(
+                "  ✓ 이메일: 성공 %d / 실패 %d", result["sent"], result["failed"]
+            )
+        except Exception as exc:
+            logger.warning("  ⚠️  이메일 발송 실패 (보고서 자체는 정상): %s", exc)
 
     logger.info("=== 완료: %d건 보고 ===", len(items))
     return report_data

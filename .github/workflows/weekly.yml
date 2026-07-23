@@ -32,6 +32,10 @@ jobs:
       # 국토부가 GitHub 러너(해외 IP)를 차단하므로 Cloudflare Worker 경유
       MOLIT_PROXY_URL: https://molit-proxy.rabbit-habbit.workers.dev
       MOLIT_PROXY_TOKEN: ${{ secrets.MOLIT_PROXY_TOKEN }}
+      # 뉴스레터 (네이버 SMTP + 구글시트 명단)
+      NAVER_SMTP_USER: ${{ secrets.NAVER_SMTP_USER }}
+      NAVER_SMTP_PASSWORD: ${{ secrets.NAVER_SMTP_PASSWORD }}
+      NEWSLETTER_SHEET_CSV_URL: ${{ secrets.NEWSLETTER_SHEET_CSV_URL }}
       # 조회수 기준·스캔 범위 조정은 여기서
       VIEW_THRESHOLD: '3000'
       SCAN_PAGES: '12'
