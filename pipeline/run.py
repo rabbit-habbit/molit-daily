@@ -131,6 +131,7 @@ def run(
     max_items: int = DEFAULT_MAX_ITEMS,
     max_age_days: int = DEFAULT_MAX_AGE_DAYS,
     weekly_guard: bool = False,
+    send_email: bool = False,
     push: bool = False,
     dry_run_push: bool = False,
     notify: bool = True,
@@ -286,6 +287,10 @@ def run(
         (out_dir / "report_data.json").write_text(
             json.dumps(report_data, ensure_ascii=False, indent=2), encoding="utf-8"
         )
+    # 뉴스레터 워크플로(별도 실행)가 읽을 수 있게 커밋되는 위치에도 저장
+    (ROOT / "state" / "last_report.json").write_text(
+        json.dumps(report_data, ensure_ascii=False, indent=2), encoding="utf-8"
+    )
     html = render_report.render(report_data)
     paths = render_report.save(html, date_str)
     for label, p in paths.items():
@@ -317,8 +322,9 @@ def run(
         except Exception as exc:
             logger.warning("  ⚠️  카카오톡 알림 실패 (보고서 자체는 정상): %s", exc)
 
-    # 7) 뉴스레터 이메일 (설정된 경우만, best-effort)
-    if notify and os.environ.get("NEWSLETTER_SHEET_CSV_URL"):
+    # 7) 뉴스레터 이메일 — 기본 OFF. 대표가 카톡으로 선 검토 후
+    #    newsletter.yml 워크플로(또는 --send-email)로 별도 발송한다.
+    if send_email and os.environ.get("NEWSLETTER_SHEET_CSV_URL"):
         url = f"{PAGES_BASE}/archive/{date_str}.html"
         logger.info("[email] 뉴스레터 발송 중...")
         try:
@@ -340,6 +346,7 @@ if __name__ == "__main__":
     parser.add_argument("--max-items", type=int, default=DEFAULT_MAX_ITEMS, help="1회 최대 보고 건수")
     parser.add_argument("--max-age-days", type=int, default=DEFAULT_MAX_AGE_DAYS, help="등록 후 N일 지난 글 제외")
     parser.add_argument("--weekly-guard", action="store_true", help="최근 5일 내 발행했으면 skip (백업 스케줄용)")
+    parser.add_argument("--send-email", action="store_true", help="발행 직후 뉴스레터도 즉시 발송 (기본: 선 검토 후 별도 발송)")
     parser.add_argument("--push", action="store_true", help="git commit + push 실행")
     parser.add_argument("--dry-run-push", action="store_true", help="git 변경사항 확인만")
     parser.add_argument("--no-notify", action="store_true", help="카카오톡 알림 비활성화")
@@ -354,6 +361,7 @@ if __name__ == "__main__":
             max_items=args.max_items,
             max_age_days=args.max_age_days,
             weekly_guard=args.weekly_guard,
+            send_email=args.send_email,
             push=args.push,
             dry_run_push=args.dry_run_push,
             notify=not args.no_notify,

@@ -1,0 +1,37 @@
+name: Send Newsletter
+
+# 대표가 토요일 아침 카톡으로 브리핑을 선 검토한 뒤, 승인되면 수동 실행.
+# - Claude에게 "뉴스레터 발송해줘" 라고 하거나
+# - GitHub → Actions → Send Newsletter → Run workflow
+# state/last_report.json(마지막 발행분)을 읽어 구독자 전원에게 발송한다.
+
+on:
+  workflow_dispatch:
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      TZ: Asia/Seoul
+      NAVER_SMTP_USER: ${{ secrets.NAVER_SMTP_USER }}
+      NAVER_SMTP_PASSWORD: ${{ secrets.NAVER_SMTP_PASSWORD }}
+      NEWSLETTER_SHEET_CSV_URL: ${{ secrets.NEWSLETTER_SHEET_CSV_URL }}
+      NEWSLETTER_FROM_NAME: 래빗해빛
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Send newsletter (state/last_report.json → subscribers)
+        run: python pipeline/notify_email.py --report state/last_report.json

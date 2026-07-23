@@ -205,7 +205,8 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--url",
-        default="https://rabbit-habbit.github.io/molit-daily/latest.html",
+        default="",
+        help="브리핑 URL (생략 시 report의 date로 archive URL 자동 생성)",
     )
     args = parser.parse_args()
 
@@ -216,6 +217,9 @@ if __name__ == "__main__":
             print(" -", e)
     else:
         data = json.loads(Path(args.report).read_text(encoding="utf-8"))
+        url = args.url or (
+            f"https://rabbit-habbit.github.io/molit-daily/archive/{data['date']}.html"
+        )
         recipients = [args.test_to] if args.test_to else None
-        result = send_newsletter(data, args.url, recipients=recipients)
+        result = send_newsletter(data, url, recipients=recipients)
         print(result)
