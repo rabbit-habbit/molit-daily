@@ -33,7 +33,7 @@ jobs:
       MOLIT_PROXY_URL: https://molit-proxy.rabbit-habbit.workers.dev
       MOLIT_PROXY_TOKEN: ${{ secrets.MOLIT_PROXY_TOKEN }}
       # 조회수 기준·스캔 범위 조정은 여기서
-      VIEW_THRESHOLD: '3000'
+      VIEW_THRESHOLD: '999999'
       SCAN_PAGES: '12'
       MAX_ITEMS_PER_RUN: '7'
     steps:
