@@ -40,6 +40,9 @@ jobs:
       VIEW_THRESHOLD: '3000'
       SCAN_PAGES: '12'
       MAX_ITEMS_PER_RUN: '7'
+      # 등록 7일 이내 신선한 글은 2,000회만 넘으면 게재 (조회수 축적 지연 보정)
+      FRESH_DAYS: '7'
+      FRESH_THRESHOLD: '2000'
     steps:
       - name: Checkout
         uses: actions/checkout@v4

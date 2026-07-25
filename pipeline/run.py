@@ -49,6 +49,11 @@ DEFAULT_PAGES = int(os.environ.get("SCAN_PAGES", "12"))
 DEFAULT_MAX_ITEMS = int(os.environ.get("MAX_ITEMS_PER_RUN", "7"))
 # 등록 후 이 일수를 넘긴 글은 조회수가 기준을 넘어도 싣지 않음 ("이번 주" 컨셉 유지)
 DEFAULT_MAX_AGE_DAYS = int(os.environ.get("MAX_AGE_DAYS", "14"))
+# 신선한 글 완화 기준: 조회수는 1~2주에 걸쳐 쌓여서, 3,000 기준만 쓰면 좋은 글이
+# 다음 주 토요일에야 잡힌다 (2026-07-25 실측: 7/14 보도가 7/25에 보고됨).
+# 등록 FRESH_DAYS일 이내 글은 FRESH_THRESHOLD만 넘으면 바로 싣는다.
+FRESH_DAYS = int(os.environ.get("FRESH_DAYS", "7"))
+FRESH_THRESHOLD = int(os.environ.get("FRESH_THRESHOLD", "2000"))
 # 의전성 게시물 제외 (조회수가 높아도 정책 실속 없음). 빈 문자열이면 필터 없음.
 EXCLUDE_TITLE_RE = os.environ.get(
     "EXCLUDE_TITLE_RE", r"^\[(장관|차관|위원장)?동정\]|^\[인사\]"
@@ -175,11 +180,13 @@ def run(
     logger.info("  ✓ %d건 스캔 (최고 조회수 %s회)", len(rows), f"{max_views:,}")
 
     # 2) 선별: 임계값 초과 + 미보고 + 의전성 게시물 제외
+    #    등록 FRESH_DAYS일 이내 신선한 글은 FRESH_THRESHOLD(완화 기준) 적용
     exclude_re = re.compile(EXCLUDE_TITLE_RE) if EXCLUDE_TITLE_RE else None
+    fresh_min_date = (now - timedelta(days=FRESH_DAYS)).strftime("%Y-%m-%d")
     candidates = [
         r
         for r in rows
-        if r.views >= threshold
+        if r.views >= (FRESH_THRESHOLD if r.date >= fresh_min_date else threshold)
         and r.date >= min_date
         and r.post_id not in reported
         and not (exclude_re and exclude_re.search(r.title))

@@ -164,7 +164,7 @@
       {% if it.summary.one_liner %}<div class="one-liner">{{ it.summary.one_liner }}</div>{% endif %}
 
       {% for para in it.summary.summary %}
-      <p class="body-para">{{ para }}</p>
+      <p class="body-para">{{ para|urlize(target="_blank") }}</p>
       {% endfor %}
 
       {% if it.summary.key_points %}
