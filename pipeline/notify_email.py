@@ -28,11 +28,19 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.utils import formataddr
 
+import json
+from pathlib import Path
+
 import requests
 from dotenv import load_dotenv
 
 load_dotenv(override=True)
 logger = logging.getLogger(__name__)
+
+ROOT = Path(__file__).resolve().parents[1]
+# 발송 이력: {"YYYY-MM-DD(호)": [보낸 이메일...]} - 같은 호 재실행 시
+# 이미 받은 사람은 제외되고 추가 신청자에게만 나간다 (git 커밋 대상)
+LOG_PATH = ROOT / "state" / "newsletter_log.json"
 
 SMTP_HOST = "smtp.naver.com"
 SMTP_PORT = 587
@@ -205,11 +213,25 @@ def send_newsletter(
 ) -> dict:
     """구독자 전원에게 개별 발송. 반환: {sent, failed, total}.
 
-    recipients를 주면 명단 조회를 건너뛰고 그 주소로만 발송 (테스트용).
+    recipients를 주면 명단 조회를 건너뛰고 그 주소로만 발송 (테스트용, 이력 미기록).
     """
     emails = recipients if recipients is not None else fetch_subscribers()
+
+    # 발송 이력 기반 증분 발송 (테스트 발송은 이력에 안 남김)
+    issue = report_data.get("date", "")
+    log = None
+    if recipients is None and issue:
+        log = json.loads(LOG_PATH.read_text(encoding="utf-8")) if LOG_PATH.exists() else {}
+        already = set(log.get(issue, []))
+        if already:
+            before = len(emails)
+            emails = [e for e in emails if e not in already]
+            logger.info(
+                "이번 호(%s) 기발송 %d명 제외 → 신규 %d명", issue, before - len(emails), len(emails)
+            )
+
     if not emails:
-        logger.info("구독자 없음 — 이메일 발송 skip")
+        logger.info("발송 대상 없음 (전원 기발송 또는 구독자 없음)")
         return {"sent": 0, "failed": 0, "total": 0}
 
     user = _smtp_user()
@@ -229,6 +251,7 @@ def send_newsletter(
     shared_html = None if use_waitlist else build_html(report_data, report_url)
 
     sent = failed = 0
+    sent_addrs: list[str] = []
     BATCH = 20  # 연결 하나로 너무 오래 보내면 서버가 끊을 수 있어 배치마다 재접속
     for i in range(0, len(emails), BATCH):
         batch = emails[i : i + BATCH]
@@ -255,6 +278,7 @@ def send_newsletter(
                 try:
                     smtp.sendmail(from_addr, [addr], msg.as_string())
                     sent += 1
+                    sent_addrs.append(addr)
                 except smtplib.SMTPException as exc:
                     failed += 1
                     logger.warning("발송 실패 %s: %s", addr, exc)
@@ -262,6 +286,12 @@ def send_newsletter(
         if i + BATCH < len(emails):
             logger.info("  ... %d/%d 발송, 잠시 후 계속", sent, len(emails))
             time.sleep(5)
+
+    if log is not None and sent_addrs:
+        log.setdefault(issue, []).extend(sent_addrs)
+        LOG_PATH.write_text(
+            json.dumps(log, ensure_ascii=False, indent=2), encoding="utf-8"
+        )
 
     logger.info("이메일 발송: 성공 %d / 실패 %d / 총 %d", sent, failed, len(emails))
     return {"sent": sent, "failed": failed, "total": len(emails)}
