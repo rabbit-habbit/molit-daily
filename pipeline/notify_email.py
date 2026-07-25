@@ -141,7 +141,7 @@ def _promo_block(report_data: dict, promo_url: str = "") -> str:
     <div style="margin-top:22px;padding:18px 20px;border-radius:14px;background:#FFF3EE;border:1.5px solid #FF6B35;">
       <div style="font-size:15px;font-weight:bold;">🌅 매일 아침이 더 궁금하다면?</div>
       <p style="margin:8px 0 0 0;font-size:13.5px;">이 국토부 브리핑은 매주 토요일 1회예요.
-      그런데 햇님이들, 경제 뉴스는 매일 아침 쏟아지잖아요. 그래서 준비 중입니다 —
+      그런데 햇님이들, 경제 뉴스는 매일 아침 쏟아지잖아요. 그래서 준비 중입니다 -
       <b>출근 전 5분, 그날의 주요 경제뉴스를 래빗해빛 해석과 함께 보내드리는 「데일리 경제 브리핑」.</b>
       오픈하면 가장 먼저, 가장 좋은 조건으로 알려드릴게요.</p>
       <div style="text-align:center;margin-top:14px;">
@@ -180,7 +180,7 @@ def build_html(report_data: dict, report_url: str, promo_url: str = "") -> str:
     <p style="margin:0 0 16px 0;font-size:14px;">
       안녕하세요, 래빗해빛이에요 🐰 제가 항상 강조하는 거 기억하시죠?
       <b style="color:#1B7A4B;">"정책은 꼭 원문으로 확인하세요."</b>
-      이번 주 화제가 된 국토부 소식 {len(items)}건, 가닥만 잡아드릴게요 —
+      이번 주 화제가 된 국토부 소식 {len(items)}건, 가닥만 잡아드릴게요 -
       자세한 건 브리핑에서 원문으로 바로 이동할 수 있어요!</p>
     {''.join(item_blocks)}
     <div style="text-align:center;margin:24px 0 8px 0;">
@@ -223,7 +223,7 @@ def send_newsletter(
     date_kr = report_data.get("date_kr", "")
     m = re.search(r"(\d+)월 (\d+)일", date_kr)
     date_short = f"{m.group(1)}/{m.group(2)}" if m else ""
-    subject = f"🏗️ 이번 주 핫한 국토부 정책 {len(items)}건 — {date_short} 래빗해빛 브리핑"
+    subject = f"🏗️ 이번 주 핫한 국토부 정책 {len(items)}건 - {date_short} 래빗해빛 브리핑"
     # 원클릭 대기명단 모드면 수신자마다 전용 링크가 든 본문을 개별 생성
     use_waitlist = bool(os.environ.get("WAITLIST_BASE_URL"))
     shared_html = None if use_waitlist else build_html(report_data, report_url)

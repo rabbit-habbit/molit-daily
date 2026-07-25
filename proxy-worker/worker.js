@@ -126,6 +126,40 @@ export default {
       return new Response("ok");
     }
 
+    // 대기명단 실시간 조회 (대표 전용 — ?key=<PROXY_TOKEN> 로 인증)
+    if (reqUrl.pathname === "/waitlist/list" && request.method === "GET") {
+      if (reqUrl.searchParams.get("key") !== env.PROXY_TOKEN) {
+        return new Response("forbidden", { status: 403 });
+      }
+      const listed = await env.WAITLIST.list({ prefix: "sub:" });
+      const entries = [];
+      for (const k of listed.keys) {
+        const when = await env.WAITLIST.get(k.name);
+        entries.push({ email: k.name.slice(4), when: when || "" });
+      }
+      entries.sort((a, b) => (a.when < b.when ? 1 : -1));
+      const rows = entries.map((e, i) => {
+        const dt = e.when ? new Date(e.when).toLocaleString("ko-KR", { timeZone: "Asia/Seoul" }) : "-";
+        return `<tr><td style="padding:8px 12px;color:#64716B;">${entries.length - i}</td>
+          <td style="padding:8px 12px;font-weight:600;">${e.email}</td>
+          <td style="padding:8px 12px;color:#64716B;">${dt}</td></tr>`;
+      }).join("");
+      const page = `<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1"><title>데일리 브리핑 대기명단</title></head>
+<body style="margin:0;font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#FFF8F5;padding:24px;">
+<div style="max-width:640px;margin:0 auto;">
+  <h2 style="color:#24302A;">🔔 데일리 브리핑 오픈 알림 대기명단</h2>
+  <p style="color:#FF6B35;font-weight:bold;font-size:18px;">${entries.length}명 신청</p>
+  <table style="width:100%;background:#fff;border:1px solid #FFE0D1;border-radius:12px;border-collapse:separate;border-spacing:0;font-size:14px;">
+    <tr style="background:#FFF3EE;"><th style="padding:10px 12px;text-align:left;">#</th>
+      <th style="padding:10px 12px;text-align:left;">이메일</th><th style="padding:10px 12px;text-align:left;">신청 시각</th></tr>
+    ${rows || '<tr><td colspan="3" style="padding:20px;text-align:center;color:#64716B;">아직 신청자가 없어요</td></tr>'}
+  </table>
+  <p style="color:#64716B;font-size:12px;margin-top:12px;">새로고침하면 실시간 반영 · 이 주소는 비공개로 관리하세요</p>
+</div></body></html>`;
+      return new Response(page, { headers: { "content-type": "text/html; charset=utf-8" } });
+    }
+
     if (request.method !== "GET") {
       return new Response("method not allowed", { status: 405 });
     }
