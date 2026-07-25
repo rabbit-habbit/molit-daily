@@ -169,23 +169,29 @@ def send_newsletter(
     html = build_html(report_data, report_url)
 
     sent = failed = 0
-    with smtplib.SMTP(SMTP_HOST, SMTP_PORT, timeout=30) as smtp:
-        smtp.starttls()
-        smtp.login(user, password)
-        for addr in emails:
-            msg = MIMEMultipart("alternative")
-            msg["Subject"] = str(Header(subject, "utf-8"))
-            msg["From"] = formataddr((str(Header(from_name, "utf-8")), from_addr))
-            msg["To"] = addr
-            msg.attach(MIMEText(f"이번 주 브리핑: {report_url}", "plain", "utf-8"))
-            msg.attach(MIMEText(html, "html", "utf-8"))
-            try:
-                smtp.sendmail(from_addr, [addr], msg.as_string())
-                sent += 1
-            except smtplib.SMTPException as exc:
-                failed += 1
-                logger.warning("발송 실패 %s: %s", addr, exc)
-            time.sleep(SEND_DELAY)
+    BATCH = 20  # 연결 하나로 너무 오래 보내면 서버가 끊을 수 있어 배치마다 재접속
+    for i in range(0, len(emails), BATCH):
+        batch = emails[i : i + BATCH]
+        with smtplib.SMTP(SMTP_HOST, SMTP_PORT, timeout=30) as smtp:
+            smtp.starttls()
+            smtp.login(user, password)
+            for addr in batch:
+                msg = MIMEMultipart("alternative")
+                msg["Subject"] = str(Header(subject, "utf-8"))
+                msg["From"] = formataddr((str(Header(from_name, "utf-8")), from_addr))
+                msg["To"] = addr
+                msg.attach(MIMEText(f"이번 주 브리핑: {report_url}", "plain", "utf-8"))
+                msg.attach(MIMEText(html, "html", "utf-8"))
+                try:
+                    smtp.sendmail(from_addr, [addr], msg.as_string())
+                    sent += 1
+                except smtplib.SMTPException as exc:
+                    failed += 1
+                    logger.warning("발송 실패 %s: %s", addr, exc)
+                time.sleep(SEND_DELAY)
+        if i + BATCH < len(emails):
+            logger.info("  ... %d/%d 발송, 잠시 후 계속", sent, len(emails))
+            time.sleep(5)
 
     logger.info("이메일 발송: 성공 %d / 실패 %d / 총 %d", sent, failed, len(emails))
     return {"sent": sent, "failed": failed, "total": len(emails)}
