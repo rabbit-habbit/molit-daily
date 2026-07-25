@@ -96,19 +96,36 @@ BTN_STYLE = (
 )
 
 
+def _token_pair(addr: str) -> tuple[str, str]:
+    """수신자 서명 토큰: t = base64(이메일), s = HMAC-SHA256(이메일) 앞 32자."""
+    secret = os.environ.get("MOLIT_PROXY_TOKEN", "")
+    if not secret:
+        return "", ""
+    t = base64.urlsafe_b64encode(addr.encode()).decode().rstrip("=")
+    s = hmac.new(secret.encode(), addr.encode(), hashlib.sha256).hexdigest()[:32]
+    return t, s
+
+
 def _waitlist_url(addr: str) -> str:
     """수신자 전용 원클릭 신청 링크 (Cloudflare Worker /waitlist).
 
-    토큰 = base64(이메일), 서명 = HMAC-SHA256(이메일, 프록시 토큰) 앞 32자.
     클릭만 하면 재입력 없이 대기명단에 기록된다.
     """
     base = os.environ.get("WAITLIST_BASE_URL", "").rstrip("/")
-    secret = os.environ.get("MOLIT_PROXY_TOKEN", "")
-    if not (base and secret):
+    t, s = _token_pair(addr)
+    if not (base and t):
         return ""
-    t = base64.urlsafe_b64encode(addr.encode()).decode().rstrip("=")
-    s = hmac.new(secret.encode(), addr.encode(), hashlib.sha256).hexdigest()[:32]
     return f"{base}?t={t}&s={s}"
+
+
+def _tokenized_report_url(report_url: str, addr: str) -> str:
+    """브리핑 링크에 수신자 토큰을 붙여, 웹 페이지 하단 예고 카드도
+    본인 원클릭 버튼으로 작동하게 한다."""
+    t, s = _token_pair(addr)
+    if not t:
+        return report_url
+    sep = "&" if "?" in report_url else "?"
+    return f"{report_url}{sep}t={t}&s={s}"
 
 
 def _promo_block(report_data: dict, promo_url: str = "") -> str:
@@ -219,8 +236,13 @@ def send_newsletter(
             smtp.starttls()
             smtp.login(user, password)
             for addr in batch:
+                url_r = (
+                    _tokenized_report_url(report_url, addr)
+                    if use_waitlist
+                    else report_url
+                )
                 html = (
-                    build_html(report_data, report_url, promo_url=_waitlist_url(addr))
+                    build_html(report_data, url_r, promo_url=_waitlist_url(addr))
                     if use_waitlist
                     else shared_html
                 )
@@ -228,7 +250,7 @@ def send_newsletter(
                 msg["Subject"] = str(Header(subject, "utf-8"))
                 msg["From"] = formataddr((str(Header(from_name, "utf-8")), from_addr))
                 msg["To"] = addr
-                msg.attach(MIMEText(f"이번 주 브리핑: {report_url}", "plain", "utf-8"))
+                msg.attach(MIMEText(f"이번 주 브리핑: {url_r}", "plain", "utf-8"))
                 msg.attach(MIMEText(html, "html", "utf-8"))
                 try:
                     smtp.sendmail(from_addr, [addr], msg.as_string())
