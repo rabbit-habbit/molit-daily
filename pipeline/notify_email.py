@@ -93,6 +93,24 @@ BTN_STYLE = (
 )
 
 
+def _promo_block(report_data: dict) -> str:
+    """데일리 브리핑 예고 카드 (promo_url이 있을 때만)."""
+    promo_url = report_data.get("promo_url") or os.environ.get("PROMO_URL", "")
+    if not promo_url:
+        return ""
+    return f"""
+    <div style="margin-top:22px;padding:18px 20px;border-radius:14px;background:#FFF3EE;border:1.5px solid #FF6B35;">
+      <div style="font-size:15px;font-weight:bold;">🌅 매일 아침이 더 궁금하다면?</div>
+      <p style="margin:8px 0 0 0;font-size:13.5px;">이 국토부 브리핑은 매주 토요일 1회예요.
+      그런데 햇님이들, 경제 뉴스는 매일 아침 쏟아지잖아요. 그래서 준비 중입니다 —
+      <b>출근 전 5분, 그날의 주요 경제뉴스를 래빗해빛 해석과 함께 보내드리는 「데일리 경제 브리핑」.</b>
+      오픈하면 가장 먼저, 가장 좋은 조건으로 알려드릴게요.</p>
+      <div style="text-align:center;margin-top:14px;">
+        <a href="{promo_url}" style="display:inline-block;padding:10px 24px;border-radius:10px;background:#FF6B35;color:#ffffff;font-weight:bold;font-size:14px;text-decoration:none;">🔔 오픈 알림 신청하기</a>
+      </div>
+    </div>"""
+
+
 def build_html(report_data: dict, report_url: str) -> str:
     """이메일 클라이언트 호환(인라인 스타일) HTML 본문."""
     items = report_data.get("items", [])
@@ -129,6 +147,7 @@ def build_html(report_data: dict, report_url: str) -> str:
     <div style="text-align:center;margin:24px 0 8px 0;">
       <a href="{report_url}" style="{BTN_STYLE}">전체 브리핑 보기 📄</a>
     </div>
+    {_promo_block(report_data)}
   </div>
   <div style="padding:20px 12px;text-align:center;font-size:12px;color:#64716B;">
     <div style="font-size:14px;font-weight:bold;color:#24302A;">부자습관은 래빗해빛 🐰</div>

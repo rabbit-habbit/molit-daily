@@ -288,6 +288,7 @@ def run(
         "threshold": threshold,
         "scan": {"pages": pages, "posts_scanned": len(rows)},
         "items": items,
+        "promo_url": os.environ.get("PROMO_URL", ""),  # 데일리 브리핑 오픈 알림 폼
         "generated_at": now.strftime("%Y-%m-%d %H:%M KST"),
     }
     if save_intermediate:
