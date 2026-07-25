@@ -6,6 +6,11 @@ compatibility_date = "2026-07-01"
 [triggers]
 crons = ["37 0 * * SAT"]
 
+# 데일리 브리핑 오픈 알림 대기명단 (이메일 원클릭 신청 기록)
+[[kv_namespaces]]
+binding = "WAITLIST"
+id = "4548772c705e4c20a79b6da8397cb7f3"
+
 # 배포: cd proxy-worker && npx wrangler deploy
 # 시크릿: npx wrangler secret put PROXY_TOKEN   (프록시 인증)
 #         npx wrangler secret put GH_TOKEN      (GitHub fine-grained PAT, Actions R/W)

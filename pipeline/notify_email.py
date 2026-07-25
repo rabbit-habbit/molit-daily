@@ -13,7 +13,10 @@
 """
 from __future__ import annotations
 
+import base64
 import csv
+import hashlib
+import hmac
 import io
 import logging
 import os
@@ -93,9 +96,28 @@ BTN_STYLE = (
 )
 
 
-def _promo_block(report_data: dict) -> str:
-    """데일리 브리핑 예고 카드 (promo_url이 있을 때만)."""
-    promo_url = report_data.get("promo_url") or os.environ.get("PROMO_URL", "")
+def _waitlist_url(addr: str) -> str:
+    """수신자 전용 원클릭 신청 링크 (Cloudflare Worker /waitlist).
+
+    토큰 = base64(이메일), 서명 = HMAC-SHA256(이메일, 프록시 토큰) 앞 32자.
+    클릭만 하면 재입력 없이 대기명단에 기록된다.
+    """
+    base = os.environ.get("WAITLIST_BASE_URL", "").rstrip("/")
+    secret = os.environ.get("MOLIT_PROXY_TOKEN", "")
+    if not (base and secret):
+        return ""
+    t = base64.urlsafe_b64encode(addr.encode()).decode().rstrip("=")
+    s = hmac.new(secret.encode(), addr.encode(), hashlib.sha256).hexdigest()[:32]
+    return f"{base}?t={t}&s={s}"
+
+
+def _promo_block(report_data: dict, promo_url: str = "") -> str:
+    """데일리 브리핑 예고 카드 (링크가 있을 때만)."""
+    promo_url = (
+        promo_url
+        or report_data.get("promo_url")
+        or os.environ.get("PROMO_URL", "")
+    )
     if not promo_url:
         return ""
     return f"""
@@ -111,7 +133,7 @@ def _promo_block(report_data: dict) -> str:
     </div>"""
 
 
-def build_html(report_data: dict, report_url: str) -> str:
+def build_html(report_data: dict, report_url: str, promo_url: str = "") -> str:
     """이메일 클라이언트 호환(인라인 스타일) HTML 본문."""
     items = report_data.get("items", [])
     date_kr = report_data.get("date_kr", "")
@@ -147,7 +169,7 @@ def build_html(report_data: dict, report_url: str) -> str:
     <div style="text-align:center;margin:24px 0 8px 0;">
       <a href="{report_url}" style="{BTN_STYLE}">전체 브리핑 보기 📄</a>
     </div>
-    {_promo_block(report_data)}
+    {_promo_block(report_data, promo_url)}
   </div>
   <div style="padding:20px 12px;text-align:center;font-size:12px;color:#64716B;">
     <div style="font-size:14px;font-weight:bold;color:#24302A;">부자습관은 래빗해빛 🐰</div>
@@ -185,7 +207,9 @@ def send_newsletter(
     m = re.search(r"(\d+)월 (\d+)일", date_kr)
     date_short = f"{m.group(1)}/{m.group(2)}" if m else ""
     subject = f"🏗️ 이번 주 핫한 국토부 정책 {len(items)}건 — {date_short} 래빗해빛 브리핑"
-    html = build_html(report_data, report_url)
+    # 원클릭 대기명단 모드면 수신자마다 전용 링크가 든 본문을 개별 생성
+    use_waitlist = bool(os.environ.get("WAITLIST_BASE_URL"))
+    shared_html = None if use_waitlist else build_html(report_data, report_url)
 
     sent = failed = 0
     BATCH = 20  # 연결 하나로 너무 오래 보내면 서버가 끊을 수 있어 배치마다 재접속
@@ -195,6 +219,11 @@ def send_newsletter(
             smtp.starttls()
             smtp.login(user, password)
             for addr in batch:
+                html = (
+                    build_html(report_data, report_url, promo_url=_waitlist_url(addr))
+                    if use_waitlist
+                    else shared_html
+                )
                 msg = MIMEMultipart("alternative")
                 msg["Subject"] = str(Header(subject, "utf-8"))
                 msg["From"] = formataddr((str(Header(from_name, "utf-8")), from_addr))

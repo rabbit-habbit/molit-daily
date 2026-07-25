@@ -49,6 +49,49 @@ function setCookies(resp) {
   return sc ? [sc] : [];
 }
 
+// ── 대기명단 원클릭 신청 ─────────────────────────────────────────────
+// 뉴스레터 메일마다 수신자 전용 링크(/waitlist?t=<b64 email>&s=<hmac>)를 심는다.
+// 클릭 → 완료 페이지가 뜨고, 페이지의 JS가 /waitlist/confirm으로 POST → KV 기록.
+// (메일 보안 스캐너는 JS를 실행하지 않으므로 봇 클릭이 명단에 안 잡힌다)
+
+async function hmacHex(secret, msg) {
+  const key = await crypto.subtle.importKey(
+    "raw", new TextEncoder().encode(secret),
+    { name: "HMAC", hash: "SHA-256" }, false, ["sign"]
+  );
+  const sig = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(msg));
+  return [...new Uint8Array(sig)].map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+function decodeToken(t) {
+  let s = t.replace(/-/g, "+").replace(/_/g, "/");
+  while (s.length % 4) s += "=";
+  try { return atob(s); } catch { return null; }
+}
+
+async function verifyWaitlist(env, t, s) {
+  const email = t ? decodeToken(t) : null;
+  if (!email || !s || !email.includes("@")) return null;
+  const expect = (await hmacHex(env.PROXY_TOKEN, email)).slice(0, 32);
+  return s === expect ? email : null;
+}
+
+const WAITLIST_PAGE = (ok) => `<!DOCTYPE html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>래빗해빛 데일리 브리핑</title></head>
+<body style="margin:0;font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#FFF8F5;">
+<div style="max-width:480px;margin:80px auto;padding:40px 32px;background:#fff;border:1.5px solid #FF6B35;border-radius:20px;text-align:center;">
+  <div style="font-size:48px;">🐰</div>
+  ${ok
+    ? `<h2 style="margin:12px 0 8px;color:#24302A;">오픈 알림 신청 완료!</h2>
+       <p style="color:#64716B;font-size:14.5px;line-height:1.7;">「데일리 경제 브리핑」이 오픈하면<br>
+       <b style="color:#FF6B35;">가장 먼저, 가장 좋은 조건으로</b> 알려드릴게요.<br>매주 토요일 국토부 브리핑도 계속 만나요!</p>`
+    : `<h2 style="margin:12px 0 8px;color:#24302A;">링크가 올바르지 않아요</h2>
+       <p style="color:#64716B;font-size:14.5px;">받으신 메일의 버튼으로 다시 시도해주세요.</p>`}
+</div>
+${ok ? `<script>fetch("/waitlist/confirm",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({t:new URLSearchParams(location.search).get("t"),s:new URLSearchParams(location.search).get("s")})});</script>` : ""}
+</body></html>`;
+
 export default {
   // Cloudflare Cron Trigger (wrangler.toml [triggers]) — 토 09:37 KST 정각
   async scheduled(event, env, ctx) {
@@ -59,13 +102,36 @@ export default {
   },
 
   async fetch(request, env) {
+    const reqUrl = new URL(request.url);
+
+    // 대기명단 경로는 공개 (수신자가 메일에서 직접 클릭)
+    if (reqUrl.pathname === "/waitlist" && request.method === "GET") {
+      const email = await verifyWaitlist(
+        env, reqUrl.searchParams.get("t"), reqUrl.searchParams.get("s")
+      );
+      return new Response(WAITLIST_PAGE(!!email), {
+        status: email ? 200 : 400,
+        headers: { "content-type": "text/html; charset=utf-8" },
+      });
+    }
+    if (reqUrl.pathname === "/waitlist/confirm" && request.method === "POST") {
+      let body;
+      try { body = await request.json(); } catch { body = {}; }
+      const email = await verifyWaitlist(env, body.t, body.s);
+      if (!email) return new Response("bad token", { status: 400 });
+      const existing = await env.WAITLIST.get("sub:" + email);
+      if (!existing) {
+        await env.WAITLIST.put("sub:" + email, new Date().toISOString());
+      }
+      return new Response("ok");
+    }
+
     if (request.method !== "GET") {
       return new Response("method not allowed", { status: 405 });
     }
     if (request.headers.get("x-proxy-token") !== env.PROXY_TOKEN) {
       return new Response("forbidden", { status: 403 });
     }
-    const reqUrl = new URL(request.url);
     // 크론 디스패치 수동 테스트용 (프록시 토큰 인증 후)
     if (reqUrl.pathname === "/cron-test") {
       const r = await dispatchWorkflow(env);
