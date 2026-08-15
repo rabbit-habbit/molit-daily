@@ -8,6 +8,9 @@ name: Send Newsletter
 on:
   workflow_dispatch:
 
+permissions:
+  contents: write  # 발송 이력(state/newsletter_log.json) 커밋용
+
 jobs:
   send:
     runs-on: ubuntu-latest
@@ -35,3 +38,10 @@ jobs:
 
       - name: Send newsletter (state/last_report.json → subscribers)
         run: python pipeline/notify_email.py --report state/last_report.json
+
+      - name: Commit send log
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add state/newsletter_log.json
+          git diff --cached --quiet || (git commit -m "chore: newsletter send log" && git push)
