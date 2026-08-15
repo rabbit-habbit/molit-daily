@@ -29,7 +29,7 @@ from dotenv import load_dotenv
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from pipeline import molit_client, notify_email, notify_kakao, render_report  # noqa: E402
+from pipeline import export_inline, molit_client, notify_email, notify_kakao, render_report  # noqa: E402
 from pipeline import summarize as sm  # noqa: E402
 
 load_dotenv(override=True)
@@ -105,7 +105,7 @@ def _git(args: list[str]) -> subprocess.CompletedProcess:
 
 
 def _git_commit_push(date_str: str, *, dry_run: bool) -> bool:
-    targets = ["docs/", "state/"]
+    targets = ["docs/", "state/", "exports/"]
     status = _git(["status", "--porcelain", *targets]).stdout.strip()
     if not status:
         logger.info("git: 변경사항 없음 — skip")
@@ -312,6 +312,14 @@ def run(
     mail_dir.mkdir(parents=True, exist_ok=True)
     (mail_dir / f"{date_str}.html").write_text(mail_html, encoding="utf-8")
     logger.info("  ✓ mail: docs/mail/%s.html", date_str)
+
+    # 블로그 포스팅용 인라인 스타일 버전 (복사·붙여넣기 대응, 커밋됨)
+    exp_dir = ROOT / "exports"
+    exp_dir.mkdir(exist_ok=True)
+    (exp_dir / f"briefing-{date_str}-inline.html").write_text(
+        export_inline.render_inline(report_data), encoding="utf-8"
+    )
+    logger.info("  ✓ inline: exports/briefing-%s-inline.html", date_str)
 
     for it in items:
         reported[it["post_id"]] = {

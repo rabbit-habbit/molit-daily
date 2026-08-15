@@ -14,9 +14,15 @@ import argparse
 import html as html_mod
 import json
 import re
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+try:
+    from pipeline.notify_email import PROMO_LANDING_URL
+except ImportError:
+    sys.path.insert(0, str(ROOT))
+    from pipeline.notify_email import PROMO_LANDING_URL
 
 FONT = "'Pretendard Variable',Pretendard,'Apple SD Gothic Neo','Malgun Gothic',sans-serif"
 
@@ -28,10 +34,10 @@ def _esc(text: str) -> str:
 
 
 def _para(text: str) -> str:
-    """이스케이프 + 본문 속 URL 링크화."""
+    """이스케이프 + 본문 속 URL 링크화 (긴 URL은 모바일에서 줄바꿈 허용)."""
     out = _esc(text)
     return URL_RE.sub(
-        r'<a href="\1" target="_blank" style="color:#1B7A4B;font-weight:600;">\1</a>', out
+        r'<a href="\1" target="_blank" style="color:#1B7A4B;font-weight:600;word-break:break-all;">\1</a>', out
     )
 
 
@@ -97,11 +103,11 @@ def render_inline(d: dict) -> str:
   </div>""")
 
     return f"""\
-<div style="max-width:680px;margin:0 auto;font-family:{FONT};color:#24302A;line-height:1.7;background:#F7FAF7;padding-bottom:8px;">
+<div style="width:100%;max-width:680px;margin:0 auto;font-family:{FONT};color:#24302A;line-height:1.7;background:#F7FAF7;padding-bottom:8px;box-sizing:border-box;word-break:keep-all;overflow-wrap:break-word;">
 
-  <div style="background:linear-gradient(135deg,#DCF2E4 0%,#BFE6CE 55%,#A5DBBC 100%);padding:36px 24px 28px 24px;border-bottom:4px solid #FF6B35;">
+  <div style="background:linear-gradient(135deg,#DCF2E4 0%,#BFE6CE 55%,#A5DBBC 100%);padding:32px 20px 26px 20px;border-bottom:4px solid #FF6B35;box-sizing:border-box;">
     <div style="font-size:12.5px;letter-spacing:0.5px;color:rgba(20,60,40,0.7);font-weight:700;">햇님이들을 위한 이번주 정책 브리핑</div>
-    <div style="font-size:24px;font-weight:800;margin-top:8px;">🏗️ 이번 주 핫한 국토부 정책</div>
+    <div style="font-size:22px;font-weight:800;margin-top:8px;">🏗️ 이번 주 핫한 국토부 정책</div>
     <div style="color:rgba(20,60,40,0.75);font-size:14px;margin-top:4px;">{_esc(d.get('date_kr',''))}</div>
     <div style="display:inline-block;margin-top:14px;padding:5px 12px;background:rgba(255,255,255,0.65);border-radius:999px;font-size:12.5px;color:#1F5138;font-weight:600;">이번 주 화제 보도 {len(d.get('items', []))}건</div>
   </div>
@@ -113,10 +119,12 @@ def render_inline(d: dict) -> str:
       <p style="margin:6px 0 0 0;">그래서 이 브리핑은 정답지가 아니라 <b>지도</b>예요. 아래에서 가닥만 잡고, 끌리는 소식은 <span style="color:#1B7A4B;font-weight:700;">[원문 읽기] 버튼으로 바로 국토부 보도자료를 직접</span> 보실 수 있어요 📄</p>
     </div>
 {''.join(items_html)}
-    <div style="margin-top:28px;padding:22px 24px;border-radius:16px;background:linear-gradient(135deg,#FFF3EE 0%,#FFE8DC 100%);border:1.5px solid #FF6B35;font-size:14px;">
+    <div style="margin-top:28px;padding:20px;border-radius:16px;background:linear-gradient(135deg,#FFF3EE 0%,#FFE8DC 100%);border:1.5px solid #FF6B35;font-size:14px;box-sizing:border-box;">
       <div style="font-size:16px;font-weight:800;margin-bottom:8px;">🌅 매일 아침이 더 궁금하다면?</div>
-      <p style="margin:0;">이 국토부 브리핑은 매주 토요일 1회예요. 그런데 햇님이들, 경제 뉴스는 매일 아침 쏟아지잖아요. 그래서 준비 중입니다 - <b>출근 전 5분, 그날의 주요 경제뉴스를 래빗해빛 해석과 함께 보내드리는 「데일리 경제 브리핑」.</b> 오픈하면 가장 먼저, 가장 좋은 조건으로 알려드릴게요.</p>
-      <div style="text-align:center;margin-top:14px;font-size:13px;color:#B45309;font-weight:600;">오픈 알림 신청은 매주 토요일 발송되는 메일 속 버튼에서 클릭 한 번이면 돼요 ✉️</div>
+      <p style="margin:0;">이 국토부 브리핑은 매주 토요일 1회예요. 그런데 햇님이들, 경제 뉴스는 매일 아침 쏟아지잖아요. 그래서 드디어 열었습니다 - <b>출근 전 5분, 그날의 주요 경제뉴스를 래빗해빛 해석과 함께 보내드리는 「데일리 경제 브리핑」.</b> 지금 얼리버드로 가장 좋은 조건에 시작하실 수 있어요!</p>
+      <div style="text-align:center;margin-top:14px;">
+        <a href="{PROMO_LANDING_URL}" target="_blank" style="display:inline-block;padding:10px 24px;border-radius:10px;background:#FF6B35;color:#FFFFFF;font-weight:700;font-size:14px;text-decoration:none;">🐰 데일리경제 얼리버드 신청하기</a>
+      </div>
     </div>
   </div>
 
