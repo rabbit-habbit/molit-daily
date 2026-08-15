@@ -292,8 +292,9 @@ if __name__ == "__main__":
             print(" -", e)
     else:
         data = json.loads(Path(args.report).read_text(encoding="utf-8"))
+        # 이메일은 얼리버드 카드가 포함된 /mail/ 전용 페이지로 유도
         url = args.url or (
-            f"https://rabbit-habbit.github.io/molit-daily/archive/{data['date']}.html"
+            f"https://rabbit-habbit.github.io/molit-daily/mail/{data['date']}.html"
         )
         recipients = [args.test_to] if args.test_to else None
         result = send_newsletter(data, url, recipients=recipients)

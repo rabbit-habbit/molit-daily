@@ -304,6 +304,15 @@ def run(
     for label, p in paths.items():
         logger.info("  ✓ %s: %s", label, p.relative_to(ROOT))
 
+    # 이메일 유입 전용 버전 (얼리버드 카드 포함) - 공개 링크와 분리
+    mail_html = render_report.render(
+        {**report_data, "promo_landing": notify_email.PROMO_LANDING_URL}
+    )
+    mail_dir = render_report.DOCS_DIR / "mail"
+    mail_dir.mkdir(parents=True, exist_ok=True)
+    (mail_dir / f"{date_str}.html").write_text(mail_html, encoding="utf-8")
+    logger.info("  ✓ mail: docs/mail/%s.html", date_str)
+
     for it in items:
         reported[it["post_id"]] = {
             "title": it["title"],
@@ -345,7 +354,7 @@ def run(
     # 7) 뉴스레터 이메일 — 기본 OFF. 대표가 카톡으로 선 검토 후
     #    newsletter.yml 워크플로(또는 --send-email)로 별도 발송한다.
     if send_email and os.environ.get("NEWSLETTER_SHEET_CSV_URL"):
-        url = f"{PAGES_BASE}/archive/{date_str}.html"
+        url = f"{PAGES_BASE}/mail/{date_str}.html"
         logger.info("[email] 뉴스레터 발송 중...")
         try:
             result = notify_email.send_newsletter(report_data, url)

@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>이번 주 핫한 국토부 정책 - 2026년 8월 15일 토요일</title>
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F7FAF7;
+    --text: #24302A;
+    --text-sub: #64716B;
+    --accent: #1B7A4B;
+    --accent-light: #E8F5EE;
+    --amber: #B45309;
+    --amber-light: #FFF7E6;
+    --border: #E2EAE4;
+    --card: #FFFFFF;
+    --rabbit-orange: #FF6B35;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: 'Pretendard Variable', 'Pretendard', -apple-system, sans-serif;
+    background: var(--bg); color: var(--text); line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+  .container { max-width: 680px; margin: 0 auto; padding: 0 20px; }
+
+  header {
+    background: linear-gradient(135deg, #DCF2E4 0%, #BFE6CE 55%, #A5DBBC 100%);
+    padding: 40px 0 32px; position: relative; overflow: hidden;
+  }
+  header::before {
+    content: '🏗️'; position: absolute; bottom: 28px; right: 56px;
+    font-size: 64px; opacity: 0.25;
+  }
+  header::after {
+    content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 4px;
+    background: linear-gradient(90deg, var(--accent), var(--rabbit-orange));
+  }
+  .brand {
+    font-size: 12.5px; letter-spacing: 0.5px;
+    color: rgba(20,60,40,0.7); font-weight: 700;
+  }
+  h1 { font-size: 24px; font-weight: 800; margin-top: 8px; }
+  .header-date { color: rgba(20,60,40,0.75); font-size: 14px; margin-top: 4px; }
+  .header-note {
+    display:inline-block; margin-top: 14px; padding: 5px 12px;
+    background: rgba(255,255,255,0.65); border-radius: 999px;
+    font-size: 12.5px; color: #1F5138; font-weight: 600;
+  }
+
+  main { padding: 28px 0 12px; }
+
+  .intro {
+    background: var(--card); border: 1.5px solid var(--accent);
+    border-radius: 16px; padding: 20px 22px; margin-bottom: 24px;
+    font-size: 14px;
+  }
+  .intro .intro-title { font-weight: 800; font-size: 15px; margin-bottom: 8px; }
+  .intro p { margin-top: 6px; }
+  .intro .highlight { color: var(--accent); font-weight: 700; }
+
+  .card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 16px; padding: 24px; margin-bottom: 20px;
+    box-shadow: 0 1px 3px rgba(20,48,35,0.05);
+  }
+  .card-meta {
+    display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px;
+    font-size: 12px; color: var(--text-sub);
+  }
+  .chip {
+    padding: 2px 10px; border-radius: 999px; background: var(--accent-light);
+    color: var(--accent); font-weight: 600;
+  }
+  .chip.views { background: var(--amber-light); color: var(--amber); }
+  .chip.plain { background: #F1F4F1; color: var(--text-sub); font-weight: 500; }
+  .card h2 { font-size: 18px; font-weight: 700; line-height: 1.45; }
+  .one-liner {
+    margin-top: 8px; font-size: 14.5px; font-weight: 600; color: var(--accent);
+  }
+  .card p.body-para { margin-top: 12px; font-size: 14.5px; }
+
+  .kp-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 8px; margin-top: 16px;
+  }
+  .kp {
+    background: #F6F9F6; border: 1px solid var(--border); border-radius: 10px;
+    padding: 10px 12px;
+  }
+  .kp .label { font-size: 11.5px; color: var(--text-sub); }
+  .kp .value { font-size: 14px; font-weight: 700; margin-top: 2px; }
+
+  .callout {
+    margin-top: 14px; padding: 12px 14px; border-radius: 10px; font-size: 13.5px;
+  }
+  .callout.idea { background: #FFF3EE; }
+  .callout b.tag { display:block; font-size: 12px; margin-bottom: 3px; }
+  .callout.idea b.tag { color: var(--rabbit-orange); }
+
+  .check-line {
+    margin-top: 12px; font-size: 13px; color: var(--amber);
+  }
+  .check-line b { font-weight: 700; }
+
+  .cta-row { margin-top: 16px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .cta {
+    display: inline-block; padding: 10px 18px; border-radius: 10px;
+    background: var(--accent); color: #fff !important; font-weight: 700;
+    font-size: 14px; text-decoration: none;
+  }
+  .cta:hover { opacity: 0.9; }
+  .cta-sub {
+    font-size: 13px; color: var(--text-sub); text-decoration: none; font-weight: 600;
+  }
+  .cta-sub:hover { text-decoration: underline; }
+
+  .empty {
+    text-align: center; padding: 48px 20px; color: var(--text-sub); font-size: 14px;
+  }
+
+  .promo {
+    margin-top: 28px; padding: 22px 24px; border-radius: 16px;
+    background: linear-gradient(135deg, #FFF3EE 0%, #FFE8DC 100%);
+    border: 1.5px solid var(--rabbit-orange); font-size: 14px;
+  }
+  .promo-title { font-size: 16px; font-weight: 800; margin-bottom: 8px; }
+  .promo-cta { text-align: center; margin-top: 16px; }
+  .promo .cta { background: var(--rabbit-orange); }
+
+  footer {
+    padding: 24px 0 48px; text-align: center;
+    font-size: 13px; color: var(--text-sub);
+  }
+  footer .logo-text { font-size: 16px; font-weight: 800; color: var(--text); }
+  footer p { margin-top: 8px; }
+  footer a { color: var(--rabbit-orange); font-weight: 700; text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+  footer .disclaimer { opacity: 0.55; }
+  footer .attribution { margin-top: 16px; font-size: 10.5px; opacity: 0.4; }
+</style>
+</head>
+<body>
+<header>
+  <div class="container">
+    <div class="brand">햇님이들을 위한 이번주 정책 브리핑</div>
+    <h1>🏗️ 이번 주 핫한 국토부 정책</h1>
+    <div class="header-date">2026년 8월 15일 토요일</div>
+    <div class="header-note">이번 주 화제 보도 5건</div>
+  </div>
+</header>
+
+<main>
+  <div class="container">
+    <div class="intro">
+      <div class="intro-title">🐰 시작 전에, 햇님이들!</div>
+      <p>제가 항상 강조하는 거 기억하시죠? <span class="highlight">"정책은 꼭 원문으로 확인하세요."</span> 원문을 보는 습관을 길러야 내가 주체적으로 해석하는 힘이 생겨요! 기사 한 줄, 요약 한 장으로는 내 상황에 맞는 조건이나 예외가 안 보이거든요.</p>
+      <p>그래서 이 브리핑은 정답지가 아니라 <b>지도</b>예요. 아래에서 가닥만 잡고, 끌리는 소식은 <span class="highlight">[원문 읽기] 버튼으로 바로 국토부 보도자료를 직접</span> 보실 수 있어요 📄</p>
+    </div>
+    <article class="card">
+      <div class="card-meta">
+        <span class="chip">주택토지</span>
+        <span class="chip views">조회 25,729회</span>
+<span class="chip plain">주택정책과</span>        <span class="chip plain">2026-08-13</span>
+      </div>
+      <h2>수도권 23만호+α 추가 공급, 주택 공급 촉진 및 청년 등 실수요자 금융지원 강화</h2>
+<div class="one-liner">🏠 수도권 23만호+ 추가 공급, 착공 기간 절반으로 단축</div>
+      <p class="body-para">국토부·금융위·국무조정실이 합동으로 &#39;주택 신속공급 방안&#39;을 발표했어요. 공급 부진으로 매매·전세·월세가 동반 상승하는 상황을 타개하고자, 수도권에서 23만호 이상을 추가 공급하고 후보지 발표부터 착공까지 걸리는 기간을 68개월에서 37개월로 절반 가까이 줄이는 게 핵심이에요. 청년·신혼부부를 위한 보금자리론 결혼 패널티 해소, 지분적립형 공공분양, 청년 전세임대 신설 등 실수요 금융지원도 함께 담겼어요.</p>
+
+      <div class="kp-grid">
+        <div class="kp">
+          <div class="label">수도권 추가 공급 목표</div>
+          <div class="value">23만호 이상</div>
+        </div>
+        <div class="kp">
+          <div class="label">착공까지 소요기간 단축</div>
+          <div class="value">68개월 → 37개월</div>
+        </div>
+        <div class="kp">
+          <div class="label">신규 공공주택지구 공급 목표</div>
+          <div class="value">10만호 이상 (서울 강서·남양주 도심·경기 광주 등 3개 지구 2.7만호 우선 공개)</div>
+        </div>
+        <div class="kp">
+          <div class="label">공공분양 지분적립·수익공유형 비율</div>
+          <div class="value">약 15%, 2025년 4분기 분양 착수</div>
+        </div>
+      </div>
+
+      <div class="callout idea"><b class="tag">🐰 래빗해빛 해석</b>공급 시그널이 이렇게 강하게 나온 건 오랜만이에요. 착공 시기가 실제로 앞당겨지면 전세 시장이 먼저 숨 고르기에 들어갈 수 있고, 결혼 페널티 해소·지분적립형 분양은 자금이 부족한 2030 직장인에게 직접적인 선택지가 될 수 있어요. 다만 '발표'와 '실제 착공'은 늘 시차가 있으니, 구체적 일정은 원문에서 꼭 확인해두세요.</div>
+      <div class="check-line">📌 <b>원문에서 확인!</b> 서울 강서·남양주 도심·경기 광주 3개 신규 지구의 지구별 공급 물량·착공 일정표, 그리고 지분적립형·수익공유형 공공분양 청약 요건을 원문에서 직접 확인해보세요.</div>
+
+      <div class="cta-row">
+        <a class="cta" href="https://www.molit.go.kr/USR/NEWS/m_71/dtl.jsp?lcmspage=1&id=95092303" target="_blank" rel="noopener">📄 원문 읽기</a>
+<a class="cta-sub" href="https://www.molit.go.kr/portal/common/download/DownloadMltm2.jsp?FilePath=/upload/portal/DextUpload/202608/20260813_115520_687.pdf&FileName=260813 (브리핑문).pdf" target="_blank" rel="noopener">PDF 내려받기 ↓</a>      </div>
+    </article>
+    <article class="card">
+      <div class="card-meta">
+        <span class="chip">주택토지</span>
+        <span class="chip views">조회 3,394회</span>
+<span class="chip plain">부동산개발산업과</span>        <span class="chip plain">2026-08-11</span>
+      </div>
+      <h2>「공인중개사법」 시행령 및 시행규칙 개정안··· 28일부터 시행</h2>
+<div class="one-liner">🏠 원룸·오피스텔 계약 전, 공동관리비 공개 의무화 8월 28일 시행</div>
+      <p class="body-para">공인중개사법 시행령·시행규칙 개정안이 8월 28일부터 시행돼요. 원룸·오피스텔 같은 소규모 주택 임대차 계약 시 공인중개사가 공동관리비(공용부분 부과 비용)를 의무적으로 확인·설명해야 하고, 주거용 오피스텔 중개보수는 상한요율 내에서 협의해 결정한다는 점도 조문에 명확히 규정돼요.</p>
+
+      <div class="kp-grid">
+        <div class="kp">
+          <div class="label">시행일</div>
+          <div class="value">2026년 8월 28일</div>
+        </div>
+        <div class="kp">
+          <div class="label">공동관리비 설명 의무</div>
+          <div class="value">원룸·오피스텔 등 소규모 주택 계약 시 적용</div>
+        </div>
+        <div class="kp">
+          <div class="label">주거용 오피스텔 중개보수</div>
+          <div class="value">상한요율 내 협의 결정 - 조문 명확화</div>
+        </div>
+        <div class="kp">
+          <div class="label">협회 법정화</div>
+          <div class="value">한국공인중개사협회, 임의단체 → 법정단체 전환</div>
+        </div>
+      </div>
+
+      <div class="callout idea"><b class="tag">🐰 래빗해빛 해석</b>원룸·오피스텔 구할 때 '관리비가 왜 이렇게 비싸지?' 싶었던 경험 있으시죠? 이제 계약 전에 공동관리비 항목을 중개사가 의무적으로 알려줘야 하니, 집 구할 때 관리비 협상 카드로 활용해볼 수 있어요.</div>
+      <div class="check-line">📌 <b>원문에서 확인!</b> 공동관리비 설명 의무에서 제외되는 비목(TV수신료·인터넷 요금 등) 범위와 주거용 오피스텔 인정 기준(전용면적 85㎡ 이하 등)을 원문에서 직접 확인해보세요.</div>
+
+      <div class="cta-row">
+        <a class="cta" href="https://www.molit.go.kr/USR/NEWS/m_71/dtl.jsp?lcmspage=1&id=95092298" target="_blank" rel="noopener">📄 원문 읽기</a>
+<a class="cta-sub" href="https://www.molit.go.kr/LCMS/DWN.jsp?fold=koreaNews/mobile/file&fileName=260811%28%EB%B3%B4%EB%8F%84%EC%9E%90%EB%A3%8C%29+%EA%B3%B5%EC%9D%B8%EC%A4%91%EA%B0%9C%EC%82%AC%EB%B2%95+%EC%8B%9C%ED%96%89%EB%A0%B9+%EB%B0%8F+%EC%8B%9C%ED%96%89%EA%B7%9C%EC%B9%99+%EA%B0%9C%EC%A0%95%EC%95%88+28%EC%9D%BC%EB%B6%80%ED%84%B0+%EC%8B%9C%ED%96%89%28%EB%B6%80%EB%8F%99%EC%82%B0%EA%B0%9C%EB%B0%9C%EC%82%B0%EC%97%85%EA%B3%BC%29.pdf" target="_blank" rel="noopener">PDF 내려받기 ↓</a>      </div>
+    </article>
+    <article class="card">
+      <div class="card-meta">
+        <span class="chip">주택토지</span>
+        <span class="chip views">조회 2,416회</span>
+<span class="chip plain">신도시정비기획과</span>        <span class="chip plain">2026-08-10</span>
+      </div>
+      <h2>제2기 노후계획도시정비특별위원회 출범… 첫 회의서 대전 기본계획안 심의</h2>
+<div class="one-liner">🏙️ 대전 노후 아파트단지, 용적률 360%로 대규모 재정비 시작돼요</div>
+      <p class="body-para">국토부가 8월 10일 제2기 노후계획도시정비특별위원회를 출범시키고, 첫 회의에서 대전 둔산지구(약 868만㎡)와 송촌·중리·법동지구(약 273만㎡) 기본계획안을 심의했어요. 두 지구 모두 용적률을 기존 220%대에서 360%로 올려 노후 단지를 대규모로 재정비하는 게 핵심이고, 충청권에서는 처음으로 이 절차를 밟는 거예요. 기본계획 승인 이후 특별정비구역 지정 등 본격 사업으로 이어질 예정이에요.</p>
+
+      <div class="kp-grid">
+        <div class="kp">
+          <div class="label">둔산지구 용적률 상향</div>
+          <div class="value">226% → 360% (특별정비예정구역 17곳)</div>
+        </div>
+        <div class="kp">
+          <div class="label">둔산지구 공급 목표</div>
+          <div class="value">현 7.4만호 → 9.5만호 (2.1만호 증가)</div>
+        </div>
+        <div class="kp">
+          <div class="label">송촌·중리·법동 용적률 상향</div>
+          <div class="value">227% → 360% (특별정비예정구역 10곳)</div>
+        </div>
+        <div class="kp">
+          <div class="label">민간위원 임기</div>
+          <div class="value">16명, 2026.8.10 ~ 2028.8.9 (2년)</div>
+        </div>
+      </div>
+
+      <div class="callout idea"><b class="tag">🐰 래빗해빛 해석</b>용적률이 현황 대비 약 1.6배 뛰는 건데, 재건축 사업성의 핵심 지표라 대전 해당 단지 소유자라면 이번 기본계획안이 어느 구역에 해당하는지 꼭 확인해볼 필요가 있어요. 다만 기본계획 심의는 아직 초기 단계이고 특별정비구역 지정·사업 시행까지는 추가 절차가 남아 있어서, 속도감보다는 방향성을 확인하는 단계로 보는 게 맞아요.</div>
+      <div class="check-line">📌 <b>원문에서 확인!</b> 원문 참고3·4에 둔산지구(17곳)·송촌중리법동지구(10곳) 특별정비예정구역 지도와 구역별 면적·세대수가 나와 있으니, 내 단지가 해당 구역에 포함되는지 직접 확인해보세요.</div>
+
+      <div class="cta-row">
+        <a class="cta" href="https://www.molit.go.kr/USR/NEWS/m_71/dtl.jsp?lcmspage=1&id=95092294" target="_blank" rel="noopener">📄 원문 읽기</a>
+<a class="cta-sub" href="https://www.molit.go.kr/LCMS/DWN.jsp?fold=koreaNews/mobile/file&fileName=260810%28%EC%84%9D%EA%B0%84%29_%EC%A0%9C2%EA%B8%B0_%EB%85%B8%ED%9B%84%EA%B3%84%ED%9A%8D%EB%8F%84%EC%8B%9C%EC%A0%95%EB%B9%84%ED%8A%B9%EB%B3%84%EC%9C%84%EC%9B%90%ED%9A%8C_%EC%B6%9C%EB%B2%94_%EC%B2%AB_%ED%9A%8C%EC%9D%98%EC%84%9C_%EB%8C%80%EC%A0%84_%EA%B8%B0%EB%B3%B8%EA%B3%84%ED%9A%8D%EC%95%88_%EC%8B%AC%EC%9D%98%28%EC%8B%A0%EB%8F%84%EC%8B%9C%EC%A0%95%EB%B9%84%EA%B8%B0%ED%9A%8D%EA%B3%BC%29.pdf" target="_blank" rel="noopener">PDF 내려받기 ↓</a>      </div>
+    </article>
+    <article class="card">
+      <div class="card-meta">
+        <span class="chip">모빌리티자동차</span>
+        <span class="chip views">조회 3,160회</span>
+<span class="chip plain">자동차운영보험과</span>        <span class="chip plain">2026-08-06</span>
+      </div>
+      <h2>안심하고 거래하는 중고차 시장 만든다 「중고차 소비자 보호대책」 추진</h2>
+<div class="one-liner">🚗 중고차 깜깜이 수수료·부실점검 이제 법으로 막는다</div>
+      <p class="body-para">정부가 2026년 8월 6일 &#39;중고차 소비자 보호대책&#39;을 발표했어요. 광고에 수수료를 모두 포함한 총액 표시를 의무화하고, 침수·사고이력 같은 중요 점검 항목을 오류 없이 기재하지 않으면 고의·과실 구분 없이 처벌받도록 제도를 바꿔요. 또 구매 후 7일 이내 주요 장치 하자로 수리비가 매매가의 30% 이상이거나 수리기간이 30일을 넘으면 계약을 취소할 수 있게 &#39;중고차 레몬법&#39;도 도입돼요.</p>
+
+      <div class="kp-grid">
+        <div class="kp">
+          <div class="label">연간 중고차 거래 규모</div>
+          <div class="value">약 250만대 / 30~35조 원</div>
+        </div>
+        <div class="kp">
+          <div class="label">성능보험료 5년 상승</div>
+          <div class="value">평균 3.7만 원('20) → 8.1만 원('25), 약 2.2배</div>
+        </div>
+        <div class="kp">
+          <div class="label">환불 기준(레몬법)</div>
+          <div class="value">구매 후 7일 이내, 수리비 300만 원 & 매매가 30% 이상 또는 누적 수리 30일 초과</div>
+        </div>
+        <div class="kp">
+          <div class="label">보장 기간 확대(안)</div>
+          <div class="value">현행 30일/2천㎞ → 60일/4천㎞(예시)</div>
+        </div>
+      </div>
+
+      <div class="callout idea"><b class="tag">🐰 래빗해빛 해석</b>중고차 살 때 '광고가 500만 원인데 계약서는 600만 원'이던 경험, 이 정책이 통과되면 원칙적으로 사라져요. 매매업자에게 하자 보증 책임이 넘어가면 소비자 입장에서 분쟁 창구가 단순해지는 것도 실질적인 변화예요.</div>
+      <div class="check-line">📌 <b>원문에서 확인!</b> 원문에서 환불 적용 제외 특약 요건, 매매업자 보험 도입 시 보험료 산정 방식, 총액 표시 전환 시행 시기를 직접 확인해 보세요.</div>
+
+      <div class="cta-row">
+        <a class="cta" href="https://www.molit.go.kr/USR/NEWS/m_71/dtl.jsp?lcmspage=1&id=95092287" target="_blank" rel="noopener">📄 원문 읽기</a>
+<a class="cta-sub" href="https://www.molit.go.kr/portal/common/download/DownloadMltm2.jsp?FilePath=/upload/portal/DextUpload/202608/20260806_121306_418.pdf&FileName=260806(안건자료) 중고차 소비자 보호대책.pdf" target="_blank" rel="noopener">PDF 내려받기 ↓</a>      </div>
+    </article>
+    <article class="card">
+      <div class="card-meta">
+        <span class="chip">모빌리티자동차</span>
+        <span class="chip views">조회 3,011회</span>
+<span class="chip plain">자동차정책과</span>        <span class="chip plain">2026-08-06</span>
+      </div>
+      <h2>현대·기아 등 자발적 시정조치(리콜)</h2>
+<div class="one-liner">🚗 현대·기아 포함 13개 차종 51만대 리콜, 내 차 확인하세요</div>
+      <p class="body-para">현대·기아·스텔란티스·혼다 4개사의 13개 차종 512,393대에서 제작 결함이 발견돼 자발적으로 리콜이 진행돼요. 화재·충돌·주행 중 동력상실 등 안전과 직결된 결함이라 해당 차종 오너라면 꼭 확인이 필요해요.</p>
+
+      <div class="kp-grid">
+        <div class="kp">
+          <div class="label">총 리콜 규모</div>
+          <div class="value">4개사 13개 차종 512,393대</div>
+        </div>
+        <div class="kp">
+          <div class="label">주요 결함 유형</div>
+          <div class="value">엔진 연료 누유로 인한 화재 / 하이브리드 제어기 과열 화재 / 전방충돌방지 오작동</div>
+        </div>
+        <div class="kp">
+          <div class="label">주요 대상 차종</div>
+          <div class="value">투싼·G80·G90·GV70·GV80·그랜저·아반떼 하이브리드·그랜저 하이브리드·K8·카니발 등</div>
+        </div>
+        <div class="kp">
+          <div class="label">리콜 여부 확인</div>
+          <div class="value">자동차리콜센터 car.go.kr / 차량번호 입력</div>
+        </div>
+      </div>
+
+      <div class="callout idea"><b class="tag">🐰 래빗해빛 해석</b>특히 카니발(99,889대)·그랜저 하이브리드(141,825대)처럼 대수가 많은 차종이 포함돼 있어요. 리콜은 무상 수리라 비용 걱정 없이 가까운 서비스센터에서 처리할 수 있으니, 해당 차종 타신다면 지금 바로 조회해 보는 게 좋아요.</div>
+      <div class="check-line">📌 <b>원문에서 확인!</b> 원문 참고 표에서 내 차의 제작일자 범위와 차종별 정확한 결함 내용, 시정조치 시작일을 직접 확인하세요.</div>
+
+      <div class="cta-row">
+        <a class="cta" href="https://www.molit.go.kr/USR/NEWS/m_71/dtl.jsp?lcmspage=1&id=95092288" target="_blank" rel="noopener">📄 원문 읽기</a>
+<a class="cta-sub" href="https://www.molit.go.kr/LCMS/DWN.jsp?fold=koreaNews/mobile/file&fileName=260806%28%EC%84%9D%EA%B0%84%29_%ED%98%84%EB%8C%80%C2%B7%EA%B8%B0%EC%95%84_%EB%93%B1_%EC%9E%90%EB%B0%9C%EC%A0%81_%EC%8B%9C%EC%A0%95%EC%A1%B0%EC%B9%98%28%EC%9E%90%EB%8F%99%EC%B0%A8%EC%A0%95%EC%B1%85%EA%B3%BC%29.pdf" target="_blank" rel="noopener">PDF 내려받기 ↓</a>      </div>
+    </article>
+
+    <div class="promo">
+      <div class="promo-title">🌅 매일 아침이 더 궁금하다면?</div>
+      <p>이 국토부 브리핑은 매주 토요일 1회예요. 그런데 햇님이들, 경제 뉴스는 매일 아침 쏟아지잖아요.
+      그래서 드디어 열었습니다 - <b>출근 전 5분, 그날의 주요 경제뉴스를 래빗해빛 해석과 함께 보내드리는
+      「데일리 경제 브리핑」.</b> 지금 얼리버드로 가장 좋은 조건에 시작하실 수 있어요!</p>
+      <div class="promo-cta"><a class="cta" href="https://app.publr.co/channels/L2NoYW5uZWxzLzIzMDY0/B00001/posts/%ED%8F%AC%EC%8A%A4%ED%8A%B81-744579" target="_blank" rel="noopener">🐰 데일리경제 얼리버드 신청하기</a></div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    <div class="logo-text">부자습관은 래빗해빛 🐰</div>
+    <p>햇님이들을 위한 이번주 국토부 정책 소식 🌞</p>
+    <p>
+      <a href="https://www.youtube.com/@rabbit._.habbit" target="_blank" rel="noopener">유튜브</a> ·
+      <a href="https://www.instagram.com/rabbit._.habbit/" target="_blank" rel="noopener">인스타그램</a>
+    </p>
+    <p class="disclaimer">본 보고서는 국토부 보도자료의 요약본이며, 투자 판단의 근거가 될 수 없습니다.</p>
+    <div class="attribution">출처: 국토교통부 보도자료 (공공누리 자유이용)</div>
+  </div>
+</footer>
+</body>
+</html>
