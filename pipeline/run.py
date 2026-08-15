@@ -329,6 +329,18 @@ def run(
             logger.info("  ✓ 카카오톡 알림 완료")
         except Exception as exc:
             logger.warning("  ⚠️  카카오톡 알림 실패 (보고서 자체는 정상): %s", exc)
+            # 카톡이 조용히 끊기면 대표가 모를 수 있으니 메일로 경고
+            try:
+                notify_email.send_alert(
+                    "⚠️ [국토부 브리핑] 카카오톡 알림 실패 - 확인 필요",
+                    f"오늘({date_str}) 브리핑은 정상 발행됐지만 카카오톡 알림이 실패했어요.\n\n"
+                    f"오류: {exc}\n\n"
+                    f"KOE322(토큰 만료)라면 Claude에게 '카카오 재인증 하자'라고 요청하세요.\n"
+                    f"브리핑: {url}",
+                )
+                logger.info("  ✓ 운영자 경고 메일 발송")
+            except Exception as mail_exc:
+                logger.warning("  경고 메일도 실패: %s", mail_exc)
 
     # 7) 뉴스레터 이메일 — 기본 OFF. 대표가 카톡으로 선 검토 후
     #    newsletter.yml 워크플로(또는 --send-email)로 별도 발송한다.

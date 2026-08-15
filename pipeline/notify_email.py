@@ -95,6 +95,23 @@ def fetch_subscribers() -> list[str]:
     return emails
 
 
+def send_alert(subject: str, body: str, to: str | None = None) -> None:
+    """운영자 알림용 단문 메일 (카카오 토큰 만료 등 시스템 경고)."""
+    user = _smtp_user()
+    password = os.environ.get("NAVER_SMTP_PASSWORD", "")
+    if not password:
+        raise RuntimeError("NAVER_SMTP_PASSWORD가 없습니다")
+    to = to or os.environ.get("OPERATOR_EMAIL", _from_address())
+    msg = MIMEText(body, "plain", "utf-8")
+    msg["Subject"] = str(Header(subject, "utf-8"))
+    msg["From"] = formataddr((str(Header("래빗해빛 시스템", "utf-8")), _from_address()))
+    msg["To"] = to
+    with smtplib.SMTP(SMTP_HOST, SMTP_PORT, timeout=30) as smtp:
+        smtp.starttls()
+        smtp.login(user, password)
+        smtp.sendmail(_from_address(), [to], msg.as_string())
+
+
 # ── 이메일 본문 ───────────────────────────────────────────────────────
 
 BTN_STYLE = (
