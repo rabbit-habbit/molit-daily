@@ -18,11 +18,6 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-try:
-    from pipeline.notify_email import PROMO_LANDING_URL
-except ImportError:
-    sys.path.insert(0, str(ROOT))
-    from pipeline.notify_email import PROMO_LANDING_URL
 
 FONT = "'Pretendard Variable',Pretendard,'Apple SD Gothic Neo','Malgun Gothic',sans-serif"
 
@@ -119,13 +114,6 @@ def render_inline(d: dict) -> str:
       <p style="margin:6px 0 0 0;">그래서 이 브리핑은 정답지가 아니라 <b>지도</b>예요. 아래에서 가닥만 잡고, 끌리는 소식은 <span style="color:#1B7A4B;font-weight:700;">[원문 읽기] 버튼으로 바로 국토부 보도자료를 직접</span> 보실 수 있어요 📄</p>
     </div>
 {''.join(items_html)}
-    <div style="margin-top:28px;padding:20px;border-radius:16px;background:linear-gradient(135deg,#FFF3EE 0%,#FFE8DC 100%);border:1.5px solid #FF6B35;font-size:14px;box-sizing:border-box;">
-      <div style="font-size:16px;font-weight:800;margin-bottom:8px;">🌅 매일 아침이 더 궁금하다면?</div>
-      <p style="margin:0;">이 국토부 브리핑은 매주 토요일 1회예요. 그런데 햇님이들, 경제 뉴스는 매일 아침 쏟아지잖아요. 그래서 드디어 열었습니다 - <b>출근 전 5분, 그날의 주요 경제뉴스를 래빗해빛 해석과 함께 보내드리는 「데일리 경제 브리핑」.</b> 지금 얼리버드로 가장 좋은 조건에 시작하실 수 있어요!</p>
-      <div style="text-align:center;margin-top:14px;">
-        <a href="{PROMO_LANDING_URL}" target="_blank" style="display:inline-block;padding:10px 24px;border-radius:10px;background:#FF6B35;color:#FFFFFF;font-weight:700;font-size:14px;text-decoration:none;">🐰 데일리경제 얼리버드 신청하기</a>
-      </div>
-    </div>
   </div>
 
   <div style="padding:24px 12px 40px 12px;text-align:center;font-size:13px;color:#64716B;">
