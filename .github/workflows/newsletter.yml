@@ -18,9 +18,6 @@ jobs:
       NAVER_SMTP_PASSWORD: ${{ secrets.NAVER_SMTP_PASSWORD }}
       NEWSLETTER_SHEET_CSV_URL: ${{ secrets.NEWSLETTER_SHEET_CSV_URL }}
       NEWSLETTER_FROM_NAME: 래빗해빛
-      # 데일리 브리핑 예고 카드 — 수신자별 원클릭 대기명단 신청 링크
-      WAITLIST_BASE_URL: https://molit-proxy.rabbit-habbit.workers.dev/waitlist
-      MOLIT_PROXY_TOKEN: ${{ secrets.MOLIT_PROXY_TOKEN }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4

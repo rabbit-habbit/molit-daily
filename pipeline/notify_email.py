@@ -13,10 +13,7 @@
 """
 from __future__ import annotations
 
-import base64
 import csv
-import hashlib
-import hmac
 import io
 import logging
 import os
@@ -121,61 +118,7 @@ BTN_STYLE = (
 )
 
 
-def _token_pair(addr: str) -> tuple[str, str]:
-    """수신자 서명 토큰: t = base64(이메일), s = HMAC-SHA256(이메일) 앞 32자."""
-    secret = os.environ.get("MOLIT_PROXY_TOKEN", "")
-    if not secret:
-        return "", ""
-    t = base64.urlsafe_b64encode(addr.encode()).decode().rstrip("=")
-    s = hmac.new(secret.encode(), addr.encode(), hashlib.sha256).hexdigest()[:32]
-    return t, s
-
-
-def _waitlist_url(addr: str) -> str:
-    """수신자 전용 원클릭 신청 링크 (Cloudflare Worker /waitlist).
-
-    클릭만 하면 재입력 없이 대기명단에 기록된다.
-    """
-    base = os.environ.get("WAITLIST_BASE_URL", "").rstrip("/")
-    t, s = _token_pair(addr)
-    if not (base and t):
-        return ""
-    return f"{base}?t={t}&s={s}"
-
-
-def _tokenized_report_url(report_url: str, addr: str) -> str:
-    """브리핑 링크에 수신자 토큰을 붙여, 웹 페이지 하단 예고 카드도
-    본인 원클릭 버튼으로 작동하게 한다."""
-    t, s = _token_pair(addr)
-    if not t:
-        return report_url
-    sep = "&" if "?" in report_url else "?"
-    return f"{report_url}{sep}t={t}&s={s}"
-
-
-def _promo_block(report_data: dict, promo_url: str = "") -> str:
-    """데일리 브리핑 예고 카드 (링크가 있을 때만)."""
-    promo_url = (
-        promo_url
-        or report_data.get("promo_url")
-        or os.environ.get("PROMO_URL", "")
-    )
-    if not promo_url:
-        return ""
-    return f"""
-    <div style="margin-top:22px;padding:18px 20px;border-radius:14px;background:#FFF3EE;border:1.5px solid #FF6B35;">
-      <div style="font-size:15px;font-weight:bold;">🌅 매일 아침이 더 궁금하다면?</div>
-      <p style="margin:8px 0 0 0;font-size:13.5px;">이 국토부 브리핑은 매주 토요일 1회예요.
-      그런데 햇님이들, 경제 뉴스는 매일 아침 쏟아지잖아요. 그래서 준비 중입니다 -
-      <b>출근 전 5분, 그날의 주요 경제뉴스를 래빗해빛 해석과 함께 보내드리는 「데일리 경제 브리핑」.</b>
-      오픈하면 가장 먼저, 가장 좋은 조건으로 알려드릴게요.</p>
-      <div style="text-align:center;margin-top:14px;">
-        <a href="{promo_url}" style="display:inline-block;padding:10px 24px;border-radius:10px;background:#FF6B35;color:#ffffff;font-weight:bold;font-size:14px;text-decoration:none;">🔔 오픈 알림 신청하기</a>
-      </div>
-    </div>"""
-
-
-def build_html(report_data: dict, report_url: str, promo_url: str = "") -> str:
+def build_html(report_data: dict, report_url: str) -> str:
     """이메일 클라이언트 호환(인라인 스타일) HTML 본문."""
     items = report_data.get("items", [])
     date_kr = report_data.get("date_kr", "")
@@ -211,7 +154,6 @@ def build_html(report_data: dict, report_url: str, promo_url: str = "") -> str:
     <div style="text-align:center;margin:24px 0 8px 0;">
       <a href="{report_url}" style="{BTN_STYLE}">전체 브리핑 보기 📄</a>
     </div>
-    {_promo_block(report_data, promo_url)}
   </div>
   <div style="padding:20px 12px;text-align:center;font-size:12px;color:#64716B;">
     <div style="font-size:14px;font-weight:bold;color:#24302A;">부자습관은 래빗해빛 🐰</div>
@@ -263,9 +205,7 @@ def send_newsletter(
     m = re.search(r"(\d+)월 (\d+)일", date_kr)
     date_short = f"{m.group(1)}/{m.group(2)}" if m else ""
     subject = f"🏗️ 이번 주 핫한 국토부 정책 {len(items)}건 - {date_short} 래빗해빛 브리핑"
-    # 원클릭 대기명단 모드면 수신자마다 전용 링크가 든 본문을 개별 생성
-    use_waitlist = bool(os.environ.get("WAITLIST_BASE_URL"))
-    shared_html = None if use_waitlist else build_html(report_data, report_url)
+    shared_html = build_html(report_data, report_url)
 
     sent = failed = 0
     sent_addrs: list[str] = []
@@ -276,22 +216,12 @@ def send_newsletter(
             smtp.starttls()
             smtp.login(user, password)
             for addr in batch:
-                url_r = (
-                    _tokenized_report_url(report_url, addr)
-                    if use_waitlist
-                    else report_url
-                )
-                html = (
-                    build_html(report_data, url_r, promo_url=_waitlist_url(addr))
-                    if use_waitlist
-                    else shared_html
-                )
                 msg = MIMEMultipart("alternative")
                 msg["Subject"] = str(Header(subject, "utf-8"))
                 msg["From"] = formataddr((str(Header(from_name, "utf-8")), from_addr))
                 msg["To"] = addr
-                msg.attach(MIMEText(f"이번 주 브리핑: {url_r}", "plain", "utf-8"))
-                msg.attach(MIMEText(html, "html", "utf-8"))
+                msg.attach(MIMEText(f"이번 주 브리핑: {report_url}", "plain", "utf-8"))
+                msg.attach(MIMEText(shared_html, "html", "utf-8"))
                 try:
                     smtp.sendmail(from_addr, [addr], msg.as_string())
                     sent += 1

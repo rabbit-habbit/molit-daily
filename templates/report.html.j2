@@ -122,16 +122,6 @@
     text-align: center; padding: 48px 20px; color: var(--text-sub); font-size: 14px;
   }
 
-  .promo {
-    margin-top: 28px; padding: 22px 24px; border-radius: 16px;
-    background: linear-gradient(135deg, #FFF3EE 0%, #FFE8DC 100%);
-    border: 1.5px solid var(--rabbit-orange); font-size: 14px;
-  }
-  .promo-title { font-size: 16px; font-weight: 800; margin-bottom: 8px; }
-  .promo-cta { text-align: center; margin-top: 16px; }
-  .promo .cta { background: var(--rabbit-orange); }
-  .promo-note { font-size: 13px; color: var(--amber); font-weight: 600; }
-
   footer {
     padding: 24px 0 48px; text-align: center;
     font-size: 13px; color: var(--text-sub);
@@ -205,33 +195,6 @@
     <div class="empty">이번 주엔 조회수 기준을 새로 넘은 보도자료가 없어요 🌿</div>
     {% endif %}
 
-    <div class="promo">
-      <div class="promo-title">🌅 매일 아침이 더 궁금하다면?</div>
-      <p>이 국토부 브리핑은 매주 토요일 1회예요. 그런데 햇님이들, 경제 뉴스는 매일 아침 쏟아지잖아요.
-      그래서 준비 중입니다 - <b>출근 전 5분, 그날의 주요 경제뉴스를 래빗해빛 해석과 함께 보내드리는
-      「데일리 경제 브리핑」.</b> 오픈하면 가장 먼저, 가장 좋은 조건으로 알려드릴게요.</p>
-      <div class="promo-cta">
-        <a id="waitlist-btn" class="cta" href="{{ promo_url or '#' }}">🔔 오픈 알림 신청하기</a>
-        <div id="waitlist-note" class="promo-note" style="display:none;">
-          오픈 알림 신청은 매주 토요일 발송되는 메일 속 버튼에서 클릭 한 번이면 돼요 ✉️</div>
-      </div>
-    </div>
-    <script>
-    (function () {
-      // 메일에서 넘어온 경우 URL에 수신자 서명 토큰(t, s)이 붙어 있음 →
-      // 신청 버튼을 본인 전용 원클릭 링크로 연결. 없으면 버튼 대신 안내 문구.
-      var p = new URLSearchParams(location.search);
-      var t = p.get("t"), s = p.get("s");
-      var btn = document.getElementById("waitlist-btn");
-      if (t && s) {
-        btn.href = "https://molit-proxy.rabbit-habbit.workers.dev/waitlist?t=" +
-          encodeURIComponent(t) + "&s=" + encodeURIComponent(s);
-      } else if (btn.getAttribute("href") === "#") {
-        btn.style.display = "none";
-        document.getElementById("waitlist-note").style.display = "block";
-      }
-    })();
-    </script>
   </div>
 </main>
 
