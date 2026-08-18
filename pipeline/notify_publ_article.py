@@ -52,8 +52,8 @@ def _kst_today() -> datetime:
 
 
 def _default_title(date: datetime) -> str:
-    yy = date.strftime("%y")
-    return f"💚 {yy}/{date.month}/{date.day}/{WEEKDAYS[date.weekday()]} 정책 브리핑"
+    # 기존 수동 등록 아티클과 동일한 형식 (예: "💚 8/15 한 주의 정책 브리핑")
+    return f"💚 {date.month}/{date.day} 한 주의 정책 브리핑"
 
 
 def _default_html_path(date: datetime) -> Path:
