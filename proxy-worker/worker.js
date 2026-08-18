@@ -21,7 +21,7 @@ const UA =
   "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36";
 
 // GitHub Actions cron은 수 시간씩 지연되는 best-effort라, 정시 발행은
-// Cloudflare Cron Trigger(분 단위 정확)가 담당한다: 토 09:37 KST에
+// Cloudflare Cron Trigger(분 단위 정확)가 담당한다: 토 08:37 KST에
 // GitHub API로 weekly.yml 워크플로를 직접 깨운다. GH_TOKEN 시크릿 필요
 // (fine-grained PAT, molit-daily 저장소 Actions read/write 전용).
 async function dispatchWorkflow(env) {
@@ -93,7 +93,7 @@ ${ok ? `<script>fetch("/waitlist/confirm",{method:"POST",headers:{"content-type"
 </body></html>`;
 
 export default {
-  // Cloudflare Cron Trigger (wrangler.toml [triggers]) — 토 09:37 KST 정각
+  // Cloudflare Cron Trigger (wrangler.toml [triggers]) — 토 08:37 KST 정각
   async scheduled(event, env, ctx) {
     const r = await dispatchWorkflow(env);
     if (r.status !== 204) {
