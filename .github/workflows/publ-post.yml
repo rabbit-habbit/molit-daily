@@ -1,0 +1,70 @@
+name: Publ Group Post
+
+# 주간 국토부 정책 브리핑 링크를 publ 그룹 채팅방에 게시.
+# 파일럿 기간에는 수동 실행 - 토요일 08:37 발행 + 카톡으로 대표가 먼저 검토한 뒤
+# Actions 탭에서 Run workflow (또는 gh workflow run publ-post.yml).
+# 검토 없이 전자동으로 바꾸려면 weekly.yml의 AUTO_PUBL 을 'true' 로.
+# 성공하면 publ-article.yml(아티클 등록 + 유료 카탈로그 연결)을 이어서 트리거한다.
+
+on:
+  workflow_dispatch:
+    inputs:
+      date:
+        description: '발행일 YYYY-MM-DD (비우면 오늘 KST)'
+        required: false
+        default: ''
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publ-post
+  cancel-in-progress: false
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: write
+    timeout-minutes: 8
+    env:
+      TZ: Asia/Seoul
+      PUBL_EMAIL: ${{ secrets.PUBL_EMAIL }}
+      PUBL_PASSWORD: ${{ secrets.PUBL_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: Install dependencies (Playwright 포함)
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Install Chromium (Playwright)
+        run: python -m playwright install --with-deps chromium
+
+      - name: Post brief link to publ group chat
+        # publ 관리자 콘솔 세션이 24시간 미만이라 매번 fresh 로그인이 더 안정적
+        run: |
+          if [ -n "${{ inputs.date }}" ]; then
+            python pipeline/notify_publ.py --date "${{ inputs.date }}" --no-session
+          else
+            python pipeline/notify_publ.py --today --no-session
+          fi
+
+      - name: Trigger publ-article workflow
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ -n "${{ inputs.date }}" ]; then
+            gh workflow run publ-article.yml --repo ${{ github.repository }} -f date="${{ inputs.date }}"
+          else
+            gh workflow run publ-article.yml --repo ${{ github.repository }}
+          fi
+          echo "✓ publ-article 트리거"

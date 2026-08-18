@@ -5,3 +5,5 @@ out/
 __pycache__/
 .DS_Store
 .proxy_token
+.publ_session.json
+.publ_images/

@@ -6,9 +6,10 @@ name: MOLIT Weekly Brief
 on:
   schedule:
     # 매주 토요일 아침 (KST). 다중 cron + state 기반 멱등 → 중복 발행 없음.
-    - cron: '37 0 * * 6'   # KST 토 09:37 (1차)
-    - cron: '7 1 * * 6'    # KST 토 10:07 (백업1)
-    - cron: '47 1 * * 6'   # KST 토 10:47 (백업2)
+    # 08:37 발행 → 카톡으로 대표 선검토 → publ 그룹톡·아티클 (2026-08-19 변경)
+    - cron: '37 23 * * 5'  # KST 토 08:37 (1차)
+    - cron: '7 0 * * 6'    # KST 토 09:07 (백업1)
+    - cron: '47 0 * * 6'   # KST 토 09:47 (백업2)
   workflow_dispatch:
 
 permissions:
@@ -21,9 +22,15 @@ concurrency:
 jobs:
   build-and-publish:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: write
     timeout-minutes: 15
     env:
       TZ: Asia/Seoul
+      # 'true' 로 바꾸면 발행 직후 publ 그룹톡·아티클까지 검토 없이 전자동.
+      # 파일럿 기간에는 'false' - 카톡으로 대표가 먼저 확인한 뒤 수동 실행.
+      AUTO_PUBL: 'false'
       ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
       ANTHROPIC_MODEL: claude-sonnet-4-6
       KAKAO_REST_API_KEY: ${{ secrets.KAKAO_REST_API_KEY }}
@@ -63,8 +70,38 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
+      - name: Check existing archive (발행 여부 판정용)
+        id: pre
+        run: |
+          TODAY=$(date +%F)
+          if [ -f "docs/archive/${TODAY}.html" ]; then
+            echo "existed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "existed=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Run pipeline (scan → select → PDF → Claude → render → push)
         run: python pipeline/run.py --push
+
+      - name: Detect publish
+        id: pub
+        run: |
+          TODAY=$(date +%F)
+          if [ "${{ steps.pre.outputs.existed }}" = "false" ] && [ -f "docs/archive/${TODAY}.html" ]; then
+            echo "published=true" >> "$GITHUB_OUTPUT"
+            echo "✓ ${TODAY} 신규 발행"
+          else
+            echo "published=false" >> "$GITHUB_OUTPUT"
+            echo "ℹ️  신규 발행 없음 (이미 발행됐거나 대상 없음) · 후속 publ 트리거 생략"
+          fi
+
+      - name: Trigger publ workflows (AUTO_PUBL=true 일 때만)
+        if: env.AUTO_PUBL == 'true' && steps.pub.outputs.published == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh workflow run publ-post.yml --repo ${{ github.repository }}
+          echo "✓ publ-post 트리거 (publ-article은 publ-post 완료 시 체이닝)"
 
       - name: Upload intermediate JSONs as artifact (on failure)
         if: failure()

@@ -2,9 +2,9 @@ name = "molit-proxy"
 main = "worker.js"
 compatibility_date = "2026-07-01"
 
-# 정시 발행: 토 09:37 KST (= 00:37 UTC SAT) 에 GitHub 워크플로 디스패치
+# 정시 발행: 토 08:37 KST (= 23:37 UTC FRI) 에 GitHub 워크플로 디스패치
 [triggers]
-crons = ["37 0 * * SAT"]
+crons = ["37 23 * * FRI"]
 
 # 데일리 브리핑 오픈 알림 대기명단 (이메일 원클릭 신청 기록)
 [[kv_namespaces]]

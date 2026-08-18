@@ -1,0 +1,66 @@
+name: Publ Article Post
+
+# publ 아티클 앱에 그 주 정책 브리핑 HTML을 등록 (썸네일·커버 자동 캡처)
+# → 유료 카탈로그 "유료 콘텐츠들(경제)"에 연결.
+# publ-post.yml 성공 시 자동 체이닝 · 수동 실행(workflow_dispatch)도 지원.
+
+on:
+  workflow_dispatch:
+    inputs:
+      date:
+        description: '발행일 YYYY-MM-DD (비우면 오늘 KST)'
+        required: false
+        default: ''
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publ-article
+  cancel-in-progress: false
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      TZ: Asia/Seoul
+      PUBL_EMAIL: ${{ secrets.PUBL_EMAIL }}
+      PUBL_PASSWORD: ${{ secrets.PUBL_PASSWORD }}
+      # publ 콘솔 '수익창출 > 카탈로그' 행 이름과 정확히 일치해야 함
+      PUBL_CATALOG_LABEL: 유료 콘텐츠들(경제)
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Install Chromium (Playwright)
+        run: python -m playwright install --with-deps chromium
+
+      - name: Post brief as publ article
+        run: |
+          if [ -n "${{ inputs.date }}" ]; then
+            python pipeline/notify_publ_article.py --date "${{ inputs.date }}" --no-session
+          else
+            python pipeline/notify_publ_article.py --today --no-session
+          fi
+
+      - name: Upload debug artifact (on failure)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: publ-article-debug-${{ github.run_id }}
+          path: |
+            .publ_images/
+          retention-days: 3
+          if-no-files-found: ignore
+          include-hidden-files: true

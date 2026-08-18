@@ -4,6 +4,9 @@
 모든 디자인을 태그별 inline style로 넣은 복사-붙여넣기용 HTML을 생성한다.
 (JS 없음 · 외부 CSS 없음 · 예고 카드는 정적 안내 문구로 대체)
 
+class="brief-header" / class="news-card"는 publ 아티클 등록 시
+notify_publ_article.py가 커버·썸네일을 캡처하는 선택자다 (스타일 영향 없음).
+
 사용:
   python pipeline/export_inline.py                       # state/last_report.json
   python pipeline/export_inline.py --report <경로> --out <경로>
@@ -86,7 +89,7 @@ def render_inline(d: dict) -> str:
             if it.get("pdf_url") else ""
         )
         items_html.append(f"""
-  <div style="background:#FFFFFF;border:1px solid #E2EAE4;border-radius:16px;padding:24px;margin-bottom:20px;">
+  <div class="news-card" style="background:#FFFFFF;border:1px solid #E2EAE4;border-radius:16px;padding:24px;margin-bottom:20px;">
     <div style="margin-bottom:10px;">{chips}</div>
     <h2 style="margin:0;font-size:18px;font-weight:700;line-height:1.45;color:#24302A;">{_esc(it.get('title',''))}</h2>
     {one_liner}{paras}
@@ -100,7 +103,7 @@ def render_inline(d: dict) -> str:
     return f"""\
 <div style="width:100%;max-width:680px;margin:0 auto;font-family:{FONT};color:#24302A;line-height:1.7;background:#F7FAF7;padding-bottom:8px;box-sizing:border-box;word-break:keep-all;overflow-wrap:break-word;">
 
-  <div style="background:linear-gradient(135deg,#DCF2E4 0%,#BFE6CE 55%,#A5DBBC 100%);padding:32px 20px 26px 20px;border-bottom:4px solid #FF6B35;box-sizing:border-box;">
+  <div class="brief-header" style="background:linear-gradient(135deg,#DCF2E4 0%,#BFE6CE 55%,#A5DBBC 100%);padding:32px 20px 26px 20px;border-bottom:4px solid #FF6B35;box-sizing:border-box;">
     <div style="font-size:12.5px;letter-spacing:0.5px;color:rgba(20,60,40,0.7);font-weight:700;">햇님이들을 위한 이번주 정책 브리핑</div>
     <div style="font-size:22px;font-weight:800;margin-top:8px;">🏗️ 이번 주 핫한 국토부 정책</div>
     <div style="color:rgba(20,60,40,0.75);font-size:14px;margin-top:4px;">{_esc(d.get('date_kr',''))}</div>
