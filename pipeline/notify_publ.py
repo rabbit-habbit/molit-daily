@@ -46,14 +46,33 @@ def _kst_today_str() -> str:
     return datetime.now(KST).strftime("%Y-%m-%d")
 
 
-def _message_for(date: datetime) -> str:
-    """발행일 기반 그룹톡 메시지 (M/D 명시 · 공개 아카이브 링크).
+# ── 서명 만료 링크 ──────────────────────────────────────────────────
+# 유료 멤버십 채팅방에 올리는 링크는 공개 Pages 주소 대신 Cloudflare Worker의
+# /brief/{app}/{date}?e=<만료>&s=<hmac> 서명 링크를 쓴다.
+# 날짜·만료를 조작하면 서명이 깨져 열리지 않고, 만료(기본 7일) 후엔 죽는다.
+# 지난 호는 publ 아티클(멤버십 인증)에서 보는 것이 정석 경로.
+WORKER_BASE = "https://molit-proxy.rabbit-habbit.workers.dev"
 
-    링크는 공개 아카이브(얼리버드 카드 없는 버전)를 쓴다 - 채널 분리 규칙.
-    """
+
+def _signed_brief_url(app: str, date_iso: str) -> str:
+    import hashlib
+    import hmac
+    import time
+
+    key = os.environ.get("LINK_SIGN_KEY", "")
+    if not key:
+        raise RuntimeError("LINK_SIGN_KEY 환경변수가 필요합니다 (서명 링크 생성용).")
+    ttl_days = int(os.environ.get("LINK_TTL_DAYS", "7"))
+    exp = int(time.time()) + ttl_days * 86400
+    sig = hmac.new(key.encode(), f"{app}/{date_iso}/{exp}".encode(), hashlib.sha256).hexdigest()[:32]
+    return f"{WORKER_BASE}/brief/{app}/{date_iso}?e={exp}&s={sig}"
+
+
+def _message_for(date: datetime) -> str:
+    """발행일 기반 그룹톡 메시지 (M/D 명시 · 서명 만료 링크)."""
     date_short = f"{date.month}/{date.day}"
     date_iso = date.strftime("%Y-%m-%d")
-    url = f"{PAGES_BASE}/archive/{date_iso}.html"
+    url = _signed_brief_url("m", date_iso)
     return (
         f"💚 [{date_short} 정책 브리핑] 이번 한 주의 국토부 주요 내용들 "
         f"(어떤 정책들이 나오고 있을까?)\n"

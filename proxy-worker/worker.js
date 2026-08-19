@@ -92,6 +92,77 @@ const WAITLIST_PAGE = (ok) => `<!DOCTYPE html>
 ${ok ? `<script>fetch("/waitlist/confirm",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({t:new URLSearchParams(location.search).get("t"),s:new URLSearchParams(location.search).get("s")})});</script>` : ""}
 </body></html>`;
 
+
+// ── 유료 브리핑 서명 링크 게이트 ─────────────────────────────────────
+// 그룹톡에는 공개 Pages 링크 대신 /brief/{app}/{date}?e=<만료 unix초>&s=<hmac>
+// 을 올린다. 날짜·만료를 조작하면 서명이 깨져 403, 만료 지나면 410.
+// 서명 키는 LINK_SIGN_KEY secret (발신 스크립트 notify_publ.py와 공유).
+// 콘텐츠는 GitHub raw에서 가져와 복사 방지 스니펫을 주입해 서빙한다.
+// 한계: 화면 캡처·개발자도구까지 막지는 못한다 (억지력 수준).
+
+const BRIEF_SOURCES = {
+  k: (date) => `https://raw.githubusercontent.com/rabbit-habbit/kyungje-daily/main/docs/archive/${date}-share-inline.html`,
+  m: (date) => `https://raw.githubusercontent.com/rabbit-habbit/molit-daily/main/exports/briefing-${date}-inline.html`,
+};
+
+const GUARD_STYLE = `<style>html,body{-webkit-user-select:none!important;user-select:none!important;-webkit-touch-callout:none!important}</style>`;
+const GUARD_SCRIPT = `<script>for(const t of["contextmenu","copy","cut","dragstart","selectstart"])document.addEventListener(t,function(e){e.preventDefault()});</script>`;
+
+const BRIEF_ERROR_PAGE = (title, msg) => `<!DOCTYPE html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>래빗해빛 브리핑</title></head>
+<body style="margin:0;font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#FFF8F5;">
+<div style="max-width:480px;margin:80px auto;padding:40px 32px;background:#fff;border:1.5px solid #FF6B35;border-radius:20px;text-align:center;">
+  <div style="font-size:48px;">🐰</div>
+  <h2 style="margin:12px 0 8px;color:#24302A;">${title}</h2>
+  <p style="color:#64716B;font-size:14.5px;line-height:1.7;">${msg}</p>
+</div></body></html>`;
+
+async function serveBrief(reqUrl, env) {
+  const m = reqUrl.pathname.match(/^\/brief\/([km])\/(\d{4}-\d{2}-\d{2})$/);
+  if (!m) return new Response(BRIEF_ERROR_PAGE("잘못된 주소예요", "받으신 링크를 그대로 눌러주세요."), {
+    status: 404, headers: { "content-type": "text/html; charset=utf-8" },
+  });
+  const [, app, date] = m;
+  const e = reqUrl.searchParams.get("e") || "";
+  const sGiven = reqUrl.searchParams.get("s") || "";
+  const expect = (await hmacHex(env.LINK_SIGN_KEY, `${app}/${date}/${e}`)).slice(0, 32);
+  if (!/^\d{9,12}$/.test(e) || sGiven !== expect) {
+    return new Response(BRIEF_ERROR_PAGE("링크가 올바르지 않아요", "멤버십 채팅방에 올라온 링크를 그대로 눌러주세요.<br>주소를 직접 수정하면 열리지 않아요."), {
+      status: 403, headers: { "content-type": "text/html; charset=utf-8" },
+    });
+  }
+  if (Date.now() / 1000 > Number(e)) {
+    return new Response(BRIEF_ERROR_PAGE("링크 유효기간이 지났어요", "지난 브리핑은 publ 앱의 아티클에서<br>언제든 다시 보실 수 있어요 🐰"), {
+      status: 410, headers: { "content-type": "text/html; charset=utf-8" },
+    });
+  }
+
+  const src = await fetch(BRIEF_SOURCES[app](date), { headers: { "User-Agent": "rh-brief-gate" } });
+  if (!src.ok) {
+    return new Response(BRIEF_ERROR_PAGE("아직 준비 중이에요", "브리핑이 아직 발행 전이거나 주소가 달라요."), {
+      status: 404, headers: { "content-type": "text/html; charset=utf-8" },
+    });
+  }
+  let html = await src.text();
+  if (/<\/body>/i.test(html)) {
+    // 완전한 문서 (kyungje) → 가드 주입
+    html = html.replace(/<head>/i, `<head>${GUARD_STYLE}`).replace(/<\/body>/i, `${GUARD_SCRIPT}</body>`);
+  } else {
+    // 본문 fragment (molit inline) → 문서로 감싸며 가드 포함
+    html = `<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>이번 주 정책 브리핑 - 래빗해빛</title>${GUARD_STYLE}</head><body style="margin:0;background:#F7FAF7;">${html}${GUARD_SCRIPT}</body></html>`;
+  }
+  return new Response(html, {
+    headers: {
+      "content-type": "text/html; charset=utf-8",
+      "cache-control": "private, no-store",
+      "x-robots-tag": "noindex, nofollow, noarchive",
+      "referrer-policy": "no-referrer",
+      "x-frame-options": "DENY",
+    },
+  });
+}
+
 export default {
   // Cloudflare Cron Trigger (wrangler.toml [triggers]) — 토 08:37 KST 정각
   async scheduled(event, env, ctx) {
@@ -158,6 +229,11 @@ export default {
   <p style="color:#64716B;font-size:12px;margin-top:12px;">새로고침하면 실시간 반영 · 이 주소는 비공개로 관리하세요</p>
 </div></body></html>`;
       return new Response(page, { headers: { "content-type": "text/html; charset=utf-8" } });
+    }
+
+    // 유료 브리핑 서명 링크 (멤버십 채팅방용 · 공개 경로)
+    if (reqUrl.pathname.startsWith("/brief/") && request.method === "GET") {
+      return serveBrief(reqUrl, env);
     }
 
     if (request.method !== "GET") {

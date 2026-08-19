@@ -32,6 +32,7 @@ jobs:
       TZ: Asia/Seoul
       PUBL_EMAIL: ${{ secrets.PUBL_EMAIL }}
       PUBL_PASSWORD: ${{ secrets.PUBL_PASSWORD }}
+      LINK_SIGN_KEY: ${{ secrets.LINK_SIGN_KEY }}
     steps:
       - uses: actions/checkout@v4
 
