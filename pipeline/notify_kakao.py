@@ -257,12 +257,20 @@ if __name__ == "__main__":
     p_send.add_argument("--text", default="🏗️ 국토부 정책 브리핑 테스트 알림 🐰")
     p_send.add_argument(
         "--url",
-        default=os.environ.get(
-            "REPORT_URL", "https://rabbit-habbit.github.io/molit-daily/latest.html"
-        ),
+        default=os.environ.get("REPORT_URL", ""),
     )
     args = parser.parse_args()
     logging.basicConfig(level=logging.INFO, format="%(message)s")
+
+    # 테스트 send의 기본 링크: 공개 Pages 폐쇄로 서명 링크를 즉석 생성
+    if getattr(args, "url", None) == "":
+        from datetime import date as _date
+
+        try:
+            from signed_link import signed_brief_url
+        except ImportError:
+            from pipeline.signed_link import signed_brief_url
+        args.url = signed_brief_url("m", _date.today().isoformat())
 
     try:
         if args.cmd == "authorize-url":

@@ -103,6 +103,7 @@ ${ok ? `<script>fetch("/waitlist/confirm",{method:"POST",headers:{"content-type"
 const BRIEF_SOURCES = {
   k: (date) => `https://raw.githubusercontent.com/rabbit-habbit/kyungje-daily/main/docs/archive/${date}-share-inline.html`,
   m: (date) => `https://raw.githubusercontent.com/rabbit-habbit/molit-daily/main/exports/briefing-${date}-inline.html`,
+  e: (date) => `https://raw.githubusercontent.com/rabbit-habbit/molit-daily/main/docs/mail/${date}.html`, // 이메일 전용 (얼리버드 카드 포함)
 };
 
 const GUARD_STYLE = `<style>html,body{-webkit-user-select:none!important;user-select:none!important;-webkit-touch-callout:none!important}</style>`;
@@ -119,7 +120,7 @@ const BRIEF_ERROR_PAGE = (title, msg) => `<!DOCTYPE html>
 </div></body></html>`;
 
 async function serveBrief(reqUrl, env) {
-  const m = reqUrl.pathname.match(/^\/brief\/([km])\/(\d{4}-\d{2}-\d{2})$/);
+  const m = reqUrl.pathname.match(/^\/brief\/([kme])\/(\d{4}-\d{2}-\d{2})$/);
   if (!m) return new Response(BRIEF_ERROR_PAGE("잘못된 주소예요", "받으신 링크를 그대로 눌러주세요."), {
     status: 404, headers: { "content-type": "text/html; charset=utf-8" },
   });

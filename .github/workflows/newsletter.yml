@@ -20,6 +20,7 @@ jobs:
       NAVER_SMTP_USER: ${{ secrets.NAVER_SMTP_USER }}
       NAVER_SMTP_PASSWORD: ${{ secrets.NAVER_SMTP_PASSWORD }}
       NEWSLETTER_SHEET_CSV_URL: ${{ secrets.NEWSLETTER_SHEET_CSV_URL }}
+      LINK_SIGN_KEY: ${{ secrets.LINK_SIGN_KEY }}
       NEWSLETTER_FROM_NAME: 래빗해빛
     steps:
       - name: Checkout

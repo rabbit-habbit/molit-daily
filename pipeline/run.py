@@ -29,7 +29,7 @@ from dotenv import load_dotenv
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from pipeline import export_inline, molit_client, notify_email, notify_kakao, render_report  # noqa: E402
+from pipeline import export_inline, molit_client, notify_email, notify_kakao, render_report, signed_link  # noqa: E402
 from pipeline import summarize as sm  # noqa: E402
 
 load_dotenv(override=True)
@@ -337,9 +337,9 @@ def run(
         logger.info("[git] 커밋·푸시...")
         _git_commit_push(date_str, dry_run=dry_run_push)
 
-    # 6) 카카오 알림 (영구 archive URL — 어제 링크를 눌러도 그날 보고서 유지)
+    # 6) 카카오 알림 (서명 만료 링크 - 공개 Pages는 2026-08-19 폐쇄)
     if notify:
-        url = f"{PAGES_BASE}/archive/{date_str}.html"
+        url = signed_link.signed_brief_url("m", date_str)
         logger.info("[kakao] 알림 전송: %s", url)
         try:
             notify_kakao.notify_from_report(report_data, url)
@@ -362,7 +362,7 @@ def run(
     # 7) 뉴스레터 이메일 — 기본 OFF. 대표가 카톡으로 선 검토 후
     #    newsletter.yml 워크플로(또는 --send-email)로 별도 발송한다.
     if send_email and os.environ.get("NEWSLETTER_SHEET_CSV_URL"):
-        url = f"{PAGES_BASE}/mail/{date_str}.html"
+        url = signed_link.signed_brief_url("e", date_str)
         logger.info("[email] 뉴스레터 발송 중...")
         try:
             result = notify_email.send_newsletter(report_data, url)
