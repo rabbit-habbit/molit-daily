@@ -1,4 +1,4 @@
-name = "molit-proxy"
+name = "policy-proxy"
 main = "worker.js"
 compatibility_date = "2026-07-01"
 
@@ -11,6 +11,14 @@ crons = ["37 23 * * FRI"]
 binding = "WAITLIST"
 id = "4548772c705e4c20a79b6da8397cb7f3"
 
+# ── 워커 3종 구성 (2026-08-20 도메인 개편) ────────────────────────────
+#  policy-proxy   (이 파일)              : 국토부 m·e + cron + waitlist KV
+#  economy-proxy  (wrangler.economy.toml): 경제 k 전용. cron·KV 없음
+#  molit-proxy    (wrangler.legacy.toml) : 구 링크 5일 유예용. cron 제거본
+#
+# ★ cron이 두 워커에 동시에 살아 있으면 국토부 발행이 두 번 디스패치된다.
+#   구 molit-proxy는 반드시 wrangler.legacy.toml(cron 없음)로 덮어쓸 것.
+#
 # 배포: cd proxy-worker && npx wrangler deploy
 # 시크릿: npx wrangler secret put PROXY_TOKEN   (프록시 인증)
 #         npx wrangler secret put GH_TOKEN      (GitHub fine-grained PAT, Actions R/W)

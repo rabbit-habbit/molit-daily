@@ -1,0 +1,15 @@
+# 경제 브리핑(손경제 Daily) 전용 워커.
+# 같은 worker.js를 쓰되 app 코드 k(/brief/k/...)만 서빙한다.
+#
+# ★ [triggers] cron 없음 - cron은 국토부 발행 디스패치용이라 여기 두면
+#   주간 발행이 두 번 돈다.
+# ★ WAITLIST KV 바인딩 없음 - 대기명단은 국토부 전용 기능.
+#   (/waitlist 경로로 트래픽이 오지 않으므로 문제 없음)
+#
+# 배포:  cd proxy-worker && npx wrangler deploy -c wrangler.economy.toml
+# 시크릿: npx wrangler secret put LINK_SIGN_KEY -c wrangler.economy.toml
+#         ※ policy-proxy와 반드시 같은 값이어야 서명이 검증된다
+
+name = "economy-proxy"
+main = "worker.js"
+compatibility_date = "2026-07-01"
