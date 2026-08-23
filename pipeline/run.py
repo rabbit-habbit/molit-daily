@@ -55,6 +55,10 @@ DEFAULT_MAX_AGE_DAYS = int(os.environ.get("MAX_AGE_DAYS", "14"))
 FRESH_DAYS = int(os.environ.get("FRESH_DAYS", "7"))
 FRESH_THRESHOLD = int(os.environ.get("FRESH_THRESHOLD", "2000"))
 # 의전성 게시물 제외 (조회수가 높아도 정책 실속 없음). 빈 문자열이면 필터 없음.
+# 발행 최소 건수: 기준 통과가 이보다 적으면, 기준 미달이어도 조회수 상위
+# 후보를 채워 넣는다 (2026-08-22 대표 결정 - 1건짜리 브리핑 방지).
+MIN_ITEMS = int(os.environ.get("MIN_ITEMS", "2"))
+
 EXCLUDE_TITLE_RE = os.environ.get(
     "EXCLUDE_TITLE_RE", r"^\[(장관|차관|위원장)?동정\]|^\[인사\]"
 )
@@ -200,6 +204,33 @@ def run(
         len(candidates),
         f" (백로그 {skipped}건은 다음 실행에)" if skipped > 0 else "",
     )
+    if candidates and len(candidates) < MIN_ITEMS:
+        prev_today = 0
+        prev_path = ROOT / "out" / "report_data.json"
+        if prev_path.exists():
+            try:
+                _prev = json.loads(prev_path.read_text(encoding="utf-8"))
+                if _prev.get("date") == date_str:
+                    prev_today = len(_prev.get("items", []))
+            except (json.JSONDecodeError, KeyError):
+                pass
+        need = MIN_ITEMS - len(candidates) - prev_today
+        if need > 0:
+            picked = {r.post_id for r in candidates}
+            pool = [
+                r
+                for r in rows
+                if r.date >= min_date
+                and r.post_id not in reported
+                and r.post_id not in picked
+                and not (exclude_re and exclude_re.search(r.title))
+            ]
+            pool.sort(key=lambda r: (not _is_core(r), -r.views))
+            backfill = pool[:need]
+            for r in backfill:
+                logger.info("  + 최소 %d건 채우기: %s (조회 %s회, 기준 미달 포함)", MIN_ITEMS, r.title, f"{r.views:,}")
+            candidates += backfill
+
     if not candidates:
         logger.info("  신규 없음 — 보고서 생성 skip. 다음 실행에서 다시 확인합니다.")
         state["last_run"] = now.isoformat()

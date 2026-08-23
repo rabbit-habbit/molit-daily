@@ -28,9 +28,9 @@ jobs:
     timeout-minutes: 15
     env:
       TZ: Asia/Seoul
-      # 'true' 로 바꾸면 발행 직후 publ 그룹톡·아티클까지 검토 없이 전자동.
-      # 파일럿 기간에는 'false' - 카톡으로 대표가 먼저 확인한 뒤 수동 실행.
-      AUTO_PUBL: 'false'
+      # 발행 직후 publ 그룹톡·아티클까지 자동 (2026-08-22 파일럿 졸업, 대표 결정).
+      # 이메일 뉴스레터만 승인 게이트 유지 (newsletter.yml 수동 실행).
+      AUTO_PUBL: 'true'
       ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
       ANTHROPIC_MODEL: claude-sonnet-4-6
       KAKAO_REST_API_KEY: ${{ secrets.KAKAO_REST_API_KEY }}
