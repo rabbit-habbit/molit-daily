@@ -6,6 +6,7 @@
 from __future__ import annotations
 
 import base64
+from datetime import datetime, timedelta, timezone
 import json
 import logging
 import os
@@ -29,6 +30,8 @@ BRAND_CONTEXT = """\
   어려운 행정용어는 풀어서 설명.
 """
 
+KST = timezone(timedelta(hours=9))
+
 SYSTEM_PROMPT = f"""\
 당신은 래빗해빛의 시니어 정책 큐레이터입니다. 조회수가 높아 화제가 된 국토부
 보도자료를 받아 직장인 구독자에게 배포할 스크랩 요약을 작성합니다.
@@ -43,6 +46,10 @@ SYSTEM_PROMPT = f"""\
 - 보도자료(PDF)에 실제로 적힌 내용만 사용하세요. 수치·날짜·지역명을 지어내지 마세요.
 - PDF가 없으면 제목에서 확실히 알 수 있는 것만 쓰고, summary에 "상세 내용은 원문 확인 필요"를 명시하세요.
 - 행정용어는 풀어서: "공모 착수" → "신청 접수를 시작해요".
+- **시제 규칙 (중요)**: 독자는 "브리핑 발행일"에 읽습니다. 발행일 기준으로 이미 지난
+  행사·설명회·마감은 반드시 과거형으로 쓰세요("대전에서 열렸어요", "안내했어요").
+  지난 일정에 참가·신청을 권유하면 안 됩니다. 발행일 이후의 일정만 "~해보세요"로
+  안내하고, 날짜는 항상 "9/15"처럼 명시하세요("오늘·내일" 금지).
 - 긴 대시(—)는 쓰지 말 것. 필요하면 짧은 하이픈(-)을 사용.
 
 ## 분량 규칙 (엄격 — 초과하면 실패)
@@ -102,9 +109,11 @@ def summarize_post(
     body_text: str = "",
 ) -> dict:
     """보도자료 1건 요약. 반환: 프롬프트의 JSON 스키마 + _meta."""
+    publish_date = datetime.now(KST).strftime("%Y-%m-%d")
     meta_line = (
         f"제목: {title}\n분야: {field_name}\n담당부서: {department}\n"
-        f"등록일: {date}\n조회수: {views:,}회"
+        f"등록일: {date}\n조회수: {views:,}회\n"
+        f"브리핑 발행일: {publish_date} (독자가 읽는 날짜 - 시제 판단 기준)"
     )
     content: list[dict] = []
     if pdf_bytes:
