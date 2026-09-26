@@ -46,7 +46,7 @@ PAGES_BASE = "https://rabbit-habbit.github.io/molit-daily"
 #  거의 걸리는 게 없으니 VIEW_THRESHOLD로 조정할 것)
 DEFAULT_THRESHOLD = int(os.environ.get("VIEW_THRESHOLD", "3000"))
 DEFAULT_PAGES = int(os.environ.get("SCAN_PAGES", "12"))
-DEFAULT_MAX_ITEMS = int(os.environ.get("MAX_ITEMS_PER_RUN", "7"))
+DEFAULT_MAX_ITEMS = int(os.environ.get("MAX_ITEMS_PER_RUN", "5"))
 # 등록 후 이 일수를 넘긴 글은 조회수가 기준을 넘어도 싣지 않음 ("이번 주" 컨셉 유지)
 DEFAULT_MAX_AGE_DAYS = int(os.environ.get("MAX_AGE_DAYS", "14"))
 # 신선한 글 완화 기준: 조회수는 1~2주에 걸쳐 쌓여서, 3,000 기준만 쓰면 좋은 글이

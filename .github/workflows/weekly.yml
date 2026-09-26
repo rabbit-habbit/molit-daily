@@ -47,7 +47,7 @@ jobs:
       # 조회수 기준·스캔 범위 조정은 여기서
       VIEW_THRESHOLD: '3000'
       SCAN_PAGES: '12'
-      MAX_ITEMS_PER_RUN: '7'
+      MAX_ITEMS_PER_RUN: '5'  # 호당 최대 5건 - 초과분은 우선순위(핵심주제→조회수) 하위부터 탈락 (2026-09-26 대표 결정)
       # 등록 7일 이내 신선한 글은 2,000회만 넘으면 게재 (조회수 축적 지연 보정)
       FRESH_DAYS: '7'
       FRESH_THRESHOLD: '2000'
