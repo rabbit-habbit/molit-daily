@@ -13,3 +13,15 @@
 name = "economy-proxy"
 main = "worker.js"
 compatibility_date = "2026-07-01"
+
+# 상위 퍼널 클릭 기록 (/r 리다이렉터).
+# 이 바인딩이 없으면 /r은 기록만 건너뛰고 리다이렉트는 정상 동작한다.
+# 링크가 죽는 것보다 통계 1건을 잃는 쪽이 싸기 때문이다.
+#
+# 준비:
+#   npx wrangler d1 create rh-clicks            → 나온 database_id를 아래에 붙인다
+#   npx wrangler d1 execute rh-clicks --remote --file=schema.sql
+[[d1_databases]]
+binding = "DB"
+database_name = "rh-clicks"
+database_id = "84cf8d33-b663-47ea-984b-23450615e93a"

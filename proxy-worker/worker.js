@@ -164,6 +164,207 @@ async function serveBrief(reqUrl, env) {
   });
 }
 
+// ── 상위 퍼널 클릭 리다이렉터 ────────────────────────────────────────
+// 브리핑 안의 상품 링크를 여기로 보내고, 기록한 뒤 실제 주소로 302 한다.
+//
+//   /r?p=<상품>&s=<지면>&v=<변형>&a=<각도>  →  302 실제 주소
+//
+// 목적지는 URL 파라미터로 받지 않고 아래 표에서만 고른다. 파라미터로 받으면
+// 누구나 우리 도메인을 경유해 아무 데로나 보낼 수 있는 오픈 리다이렉트가 된다.
+//
+// 기록 실패는 절대 리다이렉트를 막지 않는다. 링크가 죽는 것보다 통계 1건을
+// 잃는 쪽이 훨씬 싸다.
+
+// 코드 하나에 목적지 하나. 나중에 목적지가 바뀌면 코드도 새로 만든다.
+// 같은 코드로 목적지만 갈아끼우면 무료 유입과 유료 유입이 한 계열에 섞이고,
+// 계열이 끊긴 것조차 알아챌 수 없다.
+const R_DEST = {
+  // 머니프리랩 오픈 알림용 카카오 채널. 모집 전 단계의 유일한 행선지.
+  mf_kakao: "https://pf.kakao.com/_RBZrX/friend",
+
+  // 책 「잘잘잘돈」 (예스24 제휴 단축 링크, 수수료 3%).
+  //
+  // CJ온스타일 유튜브 쇼핑 링크(수수료 10%)를 쓰다가 바꿨다. 수수료율은 높지만
+  // 배송비가 붙어 독자가 19,000원대를 내는 반면 예스24는 17,100원이다.
+  // 우리가 더 버는 1,387원보다 독자가 더 내는 1,900원이 커서, 차액은 우리도
+  // 독자도 아닌 배송비로 사라진다.
+  //
+  // ★ 단축 코드 자체가 수수료 귀속을 나르므로 주소를 손대지 말 것.
+  //   펼쳐서 최종 주소로 바꾸면 수수료가 0이 되고, 그건 정산서를 보기 전까지
+  //   드러나지 않는다. 바꿔야 하면 예스24에서 새 링크를 받아 통째로 교체한다.
+  book: "https://link.yes24.com/a/LdOL9rzKu3",
+
+  taling: "https://www.taling.me/mkt/rabbit_2",
+
+  // TODO(대표님): 모집 개시 후 결제 페이지 주소를 받으면 교체한다.
+  mf_sale: "https://PLACEHOLDER/moneyfreelab",
+};
+
+// 허용값. 여기 없는 값이 오면 목적지는 정상 처리하되 ok=0으로 남겨
+// "파이프라인이 이상한 값을 보내고 있다"가 조회에서 드러나게 한다.
+// 조용히 정규화해버리면 링크 생성 버그를 영영 모른다.
+// 지면 코드. 2026-09-27 배치 확정으로 갈아치웠다.
+//   ladder    : 기초 다지기와 한줄 인사이트 사이의 상시 3종 블록
+//   article_n : 그날 기사에 이어 붙는 트리거 블록 (주 1~2회)
+// 옛 코드(basic·insight·footer·article·news)는 지금 배치에 대응하는 자리가
+// 없어 폐기했다. 데이터가 0일 때만 할 수 있는 정리라 지금 했다.
+const R_SLOTS = new Set(["ladder", "article_n"]);
+// 각도는 상시 블록이 셋을 한 번에 보여주는 구조라 의미가 줄었지만,
+// 트리거 블록이 어떤 맥락으로 붙었는지는 계속 구분한다.
+const R_ANGLES = new Set(["role", "link", "ask", "quote"]);
+const R_VARIANT_RE = /^(base|e\d{2}[ab])$/;
+
+const R_BOT_RE = /bot|crawler|spider|crawling|preview|fetch|monitor|slurp|curl|wget|headless|python-requests|okhttp|facebookexternalhit|whatsapp|telegram|kakaotalk-scrap/i;
+
+function rIsBot(request) {
+  const ua = request.headers.get("user-agent") || "";
+  if (!ua || R_BOT_RE.test(ua)) return 1;
+  // 브라우저·메신저의 사전 로딩. 사람이 누른 게 아니다.
+  const purpose = (request.headers.get("sec-purpose") || request.headers.get("purpose") || "").toLowerCase();
+  if (purpose.includes("prefetch") || purpose.includes("preview")) return 1;
+  return 0;
+}
+
+// KST 기준 날짜. 워커는 UTC로 도니 직접 더한다.
+function rKstDay(ms) {
+  return new Date(ms + 9 * 3600 * 1000).toISOString().slice(0, 10);
+}
+
+// IP 원문은 저장하지 않는다. 같은 사람의 연타를 조회 시점에 걸러내려면
+// 식별자가 필요한데, 그 용도에는 소금 친 해시 앞부분이면 충분하다.
+async function rIpHash(env, request) {
+  const ip = request.headers.get("cf-connecting-ip") || "";
+  if (!ip) return null;
+  const salt = env.LINK_SIGN_KEY || env.PROXY_TOKEN || "rh";
+  return (await hmacHex(salt, "ip:" + ip)).slice(0, 16);
+}
+
+async function serveRedirect(request, reqUrl, env, ctx) {
+  const q = reqUrl.searchParams;
+  const p = q.get("p") || "";
+  const dest = R_DEST[p];
+
+  // 상품 코드가 없으면 보낼 곳이 없다. 이것만은 막는다.
+  if (!dest) {
+    return new Response(
+      BRIEF_ERROR_PAGE("링크가 올바르지 않아요", "브리핑에 있는 링크를 그대로 눌러주세요."),
+      { status: 404, headers: { "content-type": "text/html; charset=utf-8" } }
+    );
+  }
+
+  const s = q.get("s") || "";
+  const v = q.get("v") || "";
+  const a = q.get("a") || "";
+  const ok = R_SLOTS.has(s) && R_ANGLES.has(a) && R_VARIANT_RE.test(v) ? 1 : 0;
+
+  // 기록은 응답을 붙잡지 않는다. 사람은 이미 목적지로 가고 있다.
+  if (env.DB) {
+    const now = Date.now();
+    const row = {
+      ts: Math.floor(now / 1000),
+      day: rKstDay(now),
+      p,
+      s: s.slice(0, 32),
+      v: v.slice(0, 32),
+      a: a.slice(0, 32),
+      ok,
+      bot: rIsBot(request),
+      ua: (request.headers.get("user-agent") || "").slice(0, 200),
+    };
+    const write = (async () => {
+      try {
+        const ipx = await rIpHash(env, request);
+        await env.DB.prepare(
+          "INSERT INTO clicks (ts, day, p, s, v, a, ok, bot, ipx, ua) VALUES (?,?,?,?,?,?,?,?,?,?)"
+        ).bind(row.ts, row.day, row.p, row.s, row.v, row.a, row.ok, row.bot, ipx, row.ua).run();
+      } catch (err) {
+        // 기록 실패는 삼킨다. 단 로그에는 남겨서 조용히 사라지지 않게 한다.
+        console.log("click log 실패:", err && err.message);
+      }
+    })();
+    if (ctx && typeof ctx.waitUntil === "function") ctx.waitUntil(write);
+  }
+
+  return new Response(null, {
+    status: 302,
+    headers: {
+      location: dest,
+      "cache-control": "no-store",       // 캐시되면 클릭이 안 잡힌다
+      "referrer-policy": "no-referrer",  // 서명 링크 주소가 목적지로 새지 않게
+    },
+  });
+}
+
+// ── 상품 이미지 서빙 ────────────────────────────────────────────────
+// 브리핑 HTML은 매일 새로 만들어지고 publ 아티클에도 그대로 들어가므로,
+// 이미지 주소가 변하지 않아야 한다. 저장소의 docs/img/를 우리 도메인으로
+// 중계한다. raw.githubusercontent를 직접 걸지 않는 이유가 둘이다.
+//   - 거기서는 content-type이 text/plain으로 나가는 경우가 있어 안 뜬다
+//   - 주소가 저장소 구조에 묶여서 나중에 옮기면 과거 발행분이 전부 깨진다
+// 파일명만 허용하고 경로 문자는 막는다 (디렉터리 탈출 방지).
+const IMG_SRC = (name) =>
+  `https://raw.githubusercontent.com/rabbit-habbit/kyungje-daily/main/docs/img/${name}`;
+const IMG_TYPES = { jpg: "image/jpeg", jpeg: "image/jpeg", png: "image/png", webp: "image/webp" };
+
+async function serveImage(reqUrl, env, ctx) {
+  const name = reqUrl.pathname.slice("/img/".length);
+  if (!/^[A-Za-z0-9._-]{1,64}$/.test(name) || name.includes("..")) {
+    return new Response("not found", { status: 404 });
+  }
+  const type = IMG_TYPES[(name.split(".").pop() || "").toLowerCase()];
+  if (!type) return new Response("not found", { status: 404 });
+
+  const cache = caches.default;
+  const hit = await cache.match(reqUrl.toString());
+  if (hit) return hit;
+
+  const src = await fetch(IMG_SRC(name), { headers: { "User-Agent": "rh-img" } });
+  if (!src.ok) return new Response("not found", { status: 404 });
+
+  const resp = new Response(src.body, {
+    headers: {
+      "content-type": type,
+      // 같은 파일명은 내용이 바뀌지 않는다는 전제. 바꿀 때는 파일명을 바꾼다.
+      "cache-control": "public, max-age=604800",
+      "x-content-type-options": "nosniff",
+    },
+  });
+  if (ctx && typeof ctx.waitUntil === "function") {
+    ctx.waitUntil(cache.put(reqUrl.toString(), resp.clone()));
+  }
+  return resp;
+}
+
+// 집계 조회. 대시보드와 주간 리뷰가 쓴다. PROXY_TOKEN으로 잠근다.
+async function serveRedirectStats(reqUrl, env) {
+  if (reqUrl.searchParams.get("key") !== env.PROXY_TOKEN) {
+    return new Response("forbidden", { status: 403 });
+  }
+  if (!env.DB) return new Response(JSON.stringify({ error: "DB 바인딩 없음" }), {
+    status: 503, headers: { "content-type": "application/json; charset=utf-8" },
+  });
+  const from = reqUrl.searchParams.get("from") || "0000-00-00";
+  const to = reqUrl.searchParams.get("to") || "9999-99-99";
+  // bot·ok를 합치지 않고 그대로 내보낸다. 합쳐서 내보내면 봇 트래픽이나
+  // 규격 위반이 정상 수치에 섞인 채 대시보드에 올라간다.
+  try {
+    const rows = await env.DB.prepare(
+      `SELECT day, p, s, v, a, ok, bot, COUNT(*) AS n
+         FROM clicks WHERE day >= ? AND day <= ?
+        GROUP BY day, p, s, v, a, ok, bot
+        ORDER BY day DESC`
+    ).bind(from, to).all();
+    return new Response(JSON.stringify({ from, to, rows: rows.results || [] }, null, 2), {
+      headers: { "content-type": "application/json; charset=utf-8" },
+    });
+  } catch (err) {
+    // 조회 실패를 빈 결과로 돌려주면 "클릭이 0건"으로 읽힌다. 에러로 알린다.
+    return new Response(JSON.stringify({ error: String(err && err.message || err) }), {
+      status: 500, headers: { "content-type": "application/json; charset=utf-8" },
+    });
+  }
+}
+
 export default {
   // Cloudflare Cron Trigger (wrangler.toml [triggers]) — 토 08:37 KST 정각
   async scheduled(event, env, ctx) {
@@ -173,8 +374,19 @@ export default {
     }
   },
 
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
     const reqUrl = new URL(request.url);
+
+    // 상위 퍼널 클릭 리다이렉터. 구독자가 브리핑에서 직접 누르므로 공개.
+    if (reqUrl.pathname === "/r" && request.method === "GET") {
+      return serveRedirect(request, reqUrl, env, ctx);
+    }
+    if (reqUrl.pathname === "/r/stats" && request.method === "GET") {
+      return serveRedirectStats(reqUrl, env);
+    }
+    if (reqUrl.pathname.startsWith("/img/") && request.method === "GET") {
+      return serveImage(reqUrl, env, ctx);
+    }
 
     // 대기명단 경로는 공개 (수신자가 메일에서 직접 클릭)
     if (reqUrl.pathname === "/waitlist" && request.method === "GET") {
