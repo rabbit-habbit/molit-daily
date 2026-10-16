@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>이번 주 핫한 국토부 정책 - 2026년 10월 17일 토요일</title>
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F7FAF7;
+    --text: #24302A;
+    --text-sub: #64716B;
+    --accent: #1B7A4B;
+    --accent-light: #E8F5EE;
+    --amber: #B45309;
+    --amber-light: #FFF7E6;
+    --border: #E2EAE4;
+    --card: #FFFFFF;
+    --rabbit-orange: #FF6B35;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: 'Pretendard Variable', 'Pretendard', -apple-system, sans-serif;
+    background: var(--bg); color: var(--text); line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+  .container { max-width: 680px; margin: 0 auto; padding: 0 20px; }
+
+  header {
+    background: linear-gradient(135deg, #DCF2E4 0%, #BFE6CE 55%, #A5DBBC 100%);
+    padding: 40px 0 32px; position: relative; overflow: hidden;
+  }
+  header::before {
+    content: '🏗️'; position: absolute; bottom: 28px; right: 56px;
+    font-size: 64px; opacity: 0.25;
+  }
+  header::after {
+    content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 4px;
+    background: linear-gradient(90deg, var(--accent), var(--rabbit-orange));
+  }
+  .brand {
+    font-size: 12.5px; letter-spacing: 0.5px;
+    color: rgba(20,60,40,0.7); font-weight: 700;
+  }
+  h1 { font-size: 24px; font-weight: 800; margin-top: 8px; }
+  .header-date { color: rgba(20,60,40,0.75); font-size: 14px; margin-top: 4px; }
+  .header-note {
+    display:inline-block; margin-top: 14px; padding: 5px 12px;
+    background: rgba(255,255,255,0.65); border-radius: 999px;
+    font-size: 12.5px; color: #1F5138; font-weight: 600;
+  }
+
+  main { padding: 28px 0 12px; }
+
+  .intro {
+    background: var(--card); border: 1.5px solid var(--accent);
+    border-radius: 16px; padding: 20px 22px; margin-bottom: 24px;
+    font-size: 14px;
+  }
+  .intro .intro-title { font-weight: 800; font-size: 15px; margin-bottom: 8px; }
+  .intro p { margin-top: 6px; }
+  .intro .highlight { color: var(--accent); font-weight: 700; }
+
+  .card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 16px; padding: 24px; margin-bottom: 20px;
+    box-shadow: 0 1px 3px rgba(20,48,35,0.05);
+  }
+  .card-meta {
+    display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px;
+    font-size: 12px; color: var(--text-sub);
+  }
+  .chip {
+    padding: 2px 10px; border-radius: 999px; background: var(--accent-light);
+    color: var(--accent); font-weight: 600;
+  }
+  .chip.views { background: var(--amber-light); color: var(--amber); }
+  .chip.plain { background: #F1F4F1; color: var(--text-sub); font-weight: 500; }
+  .card h2 { font-size: 18px; font-weight: 700; line-height: 1.45; }
+  .one-liner {
+    margin-top: 8px; font-size: 14.5px; font-weight: 600; color: var(--accent);
+  }
+  .card p.body-para { margin-top: 12px; font-size: 14.5px; }
+
+  .kp-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 8px; margin-top: 16px;
+  }
+  .kp {
+    background: #F6F9F6; border: 1px solid var(--border); border-radius: 10px;
+    padding: 10px 12px;
+  }
+  .kp .label { font-size: 11.5px; color: var(--text-sub); }
+  .kp .value { font-size: 14px; font-weight: 700; margin-top: 2px; }
+
+  .callout {
+    margin-top: 14px; padding: 12px 14px; border-radius: 10px; font-size: 13.5px;
+  }
+  .callout.idea { background: #FFF3EE; }
+  .callout b.tag { display:block; font-size: 12px; margin-bottom: 3px; }
+  .callout.idea b.tag { color: var(--rabbit-orange); }
+
+  .check-line {
+    margin-top: 12px; font-size: 13px; color: var(--amber);
+  }
+  .check-line b { font-weight: 700; }
+
+  .cta-row { margin-top: 16px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .cta {
+    display: inline-block; padding: 10px 18px; border-radius: 10px;
+    background: var(--accent); color: #fff !important; font-weight: 700;
+    font-size: 14px; text-decoration: none;
+  }
+  .cta:hover { opacity: 0.9; }
+  .cta-sub {
+    font-size: 13px; color: var(--text-sub); text-decoration: none; font-weight: 600;
+  }
+  .cta-sub:hover { text-decoration: underline; }
+
+  .empty {
+    text-align: center; padding: 48px 20px; color: var(--text-sub); font-size: 14px;
+  }
+
+  .promo {
+    margin-top: 28px; padding: 22px 24px; border-radius: 16px;
+    background: linear-gradient(135deg, #FFF3EE 0%, #FFE8DC 100%);
+    border: 1.5px solid var(--rabbit-orange); font-size: 14px;
+  }
+  .promo-title { font-size: 16px; font-weight: 800; margin-bottom: 8px; }
+  .promo-cta { text-align: center; margin-top: 16px; }
+  .promo .cta { background: var(--rabbit-orange); }
+
+  footer {
+    padding: 24px 0 48px; text-align: center;
+    font-size: 13px; color: var(--text-sub);
+  }
+  footer .logo-text { font-size: 16px; font-weight: 800; color: var(--text); }
+  footer p { margin-top: 8px; }
+  footer a { color: var(--rabbit-orange); font-weight: 700; text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+  footer .disclaimer { opacity: 0.55; }
+  footer .attribution { margin-top: 16px; font-size: 10.5px; opacity: 0.4; }
+</style>
+</head>
+<body>
+<header>
+  <div class="container">
+    <div class="brand">햇님이들을 위한 이번주 정책 브리핑</div>
+    <h1>🏗️ 이번 주 핫한 국토부 정책</h1>
+    <div class="header-date">2026년 10월 17일 토요일</div>
+    <div class="header-note">이번 주 화제 보도 4건</div>
+  </div>
+</header>
+
+<main>
+  <div class="container">
+    <div class="intro">
+      <div class="intro-title">🐰 시작 전에, 햇님이들!</div>
+      <p>제가 항상 강조하는 거 기억하시죠? <span class="highlight">"정책은 꼭 원문으로 확인하세요."</span> 원문을 보는 습관을 길러야 내가 주체적으로 해석하는 힘이 생겨요! 기사 한 줄, 요약 한 장으로는 내 상황에 맞는 조건이나 예외가 안 보이거든요.</p>
+      <p>그래서 이 브리핑은 정답지가 아니라 <b>지도</b>예요. 아래에서 가닥만 잡고, 끌리는 소식은 <span class="highlight">[원문 읽기] 버튼으로 바로 국토부 보도자료를 직접</span> 보실 수 있어요 📄</p>
+    </div>
+    <article class="card">
+      <div class="card-meta">
+        <span class="chip">주택토지</span>
+        <span class="chip views">조회 3,728회</span>
+<span class="chip plain">피해지원총괄과</span>        <span class="chip plain">2026-10-12</span>
+      </div>
+      <h2>9월중 전세사기피해자등 623건 추가 결정</h2>
+<div class="one-liner">🏠 전세사기 피해자 인정 누적 4만 건 돌파, LH 매입도 속도 붙었어요</div>
+      <p class="body-para">국토부가 9월 한 달간 3차례 위원회를 열어 623건을 전세사기피해자등으로 새로 인정했어요. 법 시행(&#39;23.6.1.) 이후 누적 인정 건수는 41,559건, LH의 피해주택 매입도 11,148호(9/30 기준)까지 늘었고 올해 월평균 684호 속도로 진행 중이에요. 아직 결정을 못 받은 분은 거주지 관할 시·도에 신청하거나 이의신청·재신청이 가능해요.</p>
+
+      <div class="kp-grid">
+        <div class="kp">
+          <div class="label">9월 신규 인정 건수</div>
+          <div class="value">623건 (심의 1,642건 중)</div>
+        </div>
+        <div class="kp">
+          <div class="label">누적 인정 건수</div>
+          <div class="value">41,559건 (법 시행 이후 누계)</div>
+        </div>
+        <div class="kp">
+          <div class="label">LH 피해주택 매입 완료</div>
+          <div class="value">11,148호 (9/30 기준, 월평균 684호)</div>
+        </div>
+        <div class="kp">
+          <div class="label">피해자 지원 실적 합계</div>
+          <div class="value">총 80,188건 (주거·금융·법률 등)</div>
+        </div>
+      </div>
+
+      <div class="callout idea"><b class="tag">🐰 래빗해빛 해석</b>피해자의 75% 이상이 40세 미만 청년층이고, 보증금 3억 원 이하 케이스가 97.7%예요. 전세로 내 집 마련을 준비 중인 직장인이라면, 계약 전 HUG 안심전세포털의 '안전계약 컨설팅'(현재 8개 지역 운영 중)을 활용하는 게 현실적인 리스크 관리 방법이에요.</div>
+      <div class="check-line">📌 <b>원문에서 확인!</b> 부결 사유 6가지 상세 요건(대항력·보증금 상한·다수피해 등)과 지역별·주택유형별 피해 분포표를 원문 참고자료에서 직접 확인해보세요.</div>
+
+      <div class="cta-row">
+        <a class="cta" href="https://www.molit.go.kr/USR/NEWS/m_71/dtl.jsp?lcmspage=1&id=95092490" target="_blank" rel="noopener">📄 원문 읽기</a>
+<a class="cta-sub" href="https://www.molit.go.kr/LCMS/DWN.jsp?fold=koreaNews/mobile/file&fileName=261012%28%EC%84%9D%EA%B0%84%29+9%EC%9B%94%EC%A4%91+%EC%A0%84%EC%84%B8%EC%82%AC%EA%B8%B0%ED%94%BC%ED%95%B4%EC%9E%90%EB%93%B1+623%EA%B1%B4+%EC%B6%94%EA%B0%80+%EA%B2%B0%EC%A0%95%28%EC%A0%84%EC%84%B8%EC%82%AC%EA%B8%B0%ED%94%BC%ED%95%B4%EC%A7%80%EC%9B%90%EB%8B%A8%29.pdf" target="_blank" rel="noopener">PDF 내려받기 ↓</a>      </div>
+    </article>
+    <article class="card">
+      <div class="card-meta">
+        <span class="chip">주택토지</span>
+        <span class="chip views">조회 2,301회</span>
+<span class="chip plain">신도시정비기획과</span>        <span class="chip plain">2026-10-14</span>
+      </div>
+      <h2>정비사업 조합 위법행위 특별현장점검 실시</h2>
+<div class="one-liner">🔍 재개발·재건축 공사비 부풀리기, 국토부가 직접 현장 점검 나서요</div>
+      <p class="body-para">국토부가 재개발·재건축 조합의 공사비 과다 산정·증액 문제를 잡기 위해 10/19부터 2차에 걸쳐 16개 사업장 합동 특별현장점검에 들어가요. 앞서 8/27~9/22 전수조사에서 전국 568개 사업장 중 공사비 검증을 안 한 곳이 138곳으로 확인됐고, 그중 16곳이 이번 점검 대상이에요. 위반 확인 시 시정명령은 물론 횡령·사기 등 중대 범죄는 수사 의뢰까지 간다고 해요.</p>
+
+      <div class="kp-grid">
+        <div class="kp">
+          <div class="label">전수조사 대상</div>
+          <div class="value">전국 재개발·재건축 568곳 (시공자 선정 완료 기준)</div>
+        </div>
+        <div class="kp">
+          <div class="label">공사비 검증 미이행</div>
+          <div class="value">138곳 (전수조사 결과)</div>
+        </div>
+        <div class="kp">
+          <div class="label">이번 점검 대상</div>
+          <div class="value">16개 사업장</div>
+        </div>
+        <div class="kp">
+          <div class="label">점검 일정</div>
+          <div class="value">1차 10/19~10/30 · 2차 11/9~11/20</div>
+        </div>
+      </div>
+
+      <div class="callout idea"><b class="tag">🐰 래빗해빛 해석</b>재개발·재건축 조합원이라면 공사비 분쟁이 곧 추가 분담금 폭탄으로 이어질 수 있어서 직접적인 돈 문제거든요. 이번 점검이 사업 지연 해소에 얼마나 실효성이 있을지, 내 구역이 138곳 안에 포함되는지 원문으로 꼭 확인해보세요.</div>
+      <div class="check-line">📌 <b>원문에서 확인!</b> 원문에서 기관별 점검 항목(공사비 적정성·법령 위반·조합 운영 등 역할 분담표)과 점검 후속 조치 절차를 직접 확인해보세요.</div>
+
+      <div class="cta-row">
+        <a class="cta" href="https://www.molit.go.kr/USR/NEWS/m_71/dtl.jsp?lcmspage=1&id=95092494" target="_blank" rel="noopener">📄 원문 읽기</a>
+<a class="cta-sub" href="https://www.molit.go.kr/LCMS/DWN.jsp?fold=koreaNews/mobile/file&fileName=261015%28%EC%A1%B0%EA%B0%84%29+%EC%A0%95%EB%B9%84%EC%82%AC%EC%97%85+%EC%A1%B0%ED%95%A9+%EC%9C%84%EB%B2%95%ED%96%89%EC%9C%84+%ED%8A%B9%EB%B3%84%ED%98%84%EC%9E%A5%EC%A0%90%EA%B2%80+%EC%8B%A4%EC%8B%9C%28%EC%8B%A0%EB%8F%84%EC%8B%9C%EC%A0%95%EB%B9%84%EA%B8%B0%ED%9A%8D%EA%B3%BC%29.pdf" target="_blank" rel="noopener">PDF 내려받기 ↓</a>      </div>
+    </article>
+    <article class="card">
+      <div class="card-meta">
+        <span class="chip">국토도시</span>
+        <span class="chip views">조회 3,160회</span>
+<span class="chip plain">성장거점정책과</span>        <span class="chip plain">2026-10-13</span>
+      </div>
+      <h2>세종 중심 국정운영 강화, 2차 중앙행정기관 이전 본격 추진</h2>
+<div class="one-liner">🏛️ 수도권 44개 중앙기관, 세종으로 대이동 시작돼요</div>
+      <p class="body-para">행정안전부가 수도권에 있는 중앙행정기관 44개, 공무원 약 9,929명을 세종으로 단계적으로 이전하는 계획을 10/13 발표했어요. 금융위원회·개인정보보호위원회 등 27개 기관은 2027년 중 임차 청사를 활용해 먼저 옮기고, 경찰청·감사원 등 독립 청사가 필요한 17개 기관은 2031년까지 신축 후 순차 이전해요.</p>
+
+      <div class="kp-grid">
+        <div class="kp">
+          <div class="label">이전 대상</div>
+          <div class="value">44개 기관, 9,929명</div>
+        </div>
+        <div class="kp">
+          <div class="label">1차 조기 이전</div>
+          <div class="value">27개 기관, 2027년 중 완료 목표</div>
+        </div>
+        <div class="kp">
+          <div class="label">신축 후 이전</div>
+          <div class="value">17개 기관, 2031년까지 순차 이전</div>
+        </div>
+        <div class="kp">
+          <div class="label">총 청사 건립 예산</div>
+          <div class="value">약 3조 1천억 원 추산</div>
+        </div>
+      </div>
+
+      <div class="callout idea"><b class="tag">🐰 래빗해빛 해석</b>세종으로 공무원 1만 명 가까이 이동하면 세종 주거·상권 수요는 늘고, 서울·과천 등 기존 청사 밀집지역 오피스·상가엔 공실 변수가 생길 수 있어요. 세종 부동산에 관심 있다면 이전 기관 명단과 일정을 눈여겨볼 타이밍이에요.</div>
+      <div class="check-line">📌 <b>원문에서 확인!</b> 원문 붙임 표에서 기관별 현재 소재지·정원·이전 시기를 한눈에 확인할 수 있으니, 내 직장이나 거주지 주변 기관이 포함됐는지 직접 살펴보세요.</div>
+
+      <div class="cta-row">
+        <a class="cta" href="https://www.molit.go.kr/USR/NEWS/m_71/dtl.jsp?lcmspage=1&id=95092493" target="_blank" rel="noopener">📄 원문 읽기</a>
+<a class="cta-sub" href="https://www.molit.go.kr/LCMS/DWN.jsp?fold=koreaNews/mobile/file&fileName=%28%EB%B3%B4%EB%8F%84%EC%9E%90%EB%A3%8C%29+2%EC%B0%A8+%EC%A4%91%EC%95%99%ED%96%89%EC%A0%95%EA%B8%B0%EA%B4%80+%EC%9D%B4%EC%A0%84%28%ED%96%89%EC%A0%95%EC%95%88%EC%A0%84%EB%B6%80%29.pdf" target="_blank" rel="noopener">PDF 내려받기 ↓</a>      </div>
+    </article>
+    <article class="card">
+      <div class="card-meta">
+        <span class="chip">건설</span>
+        <span class="chip views">조회 3,135회</span>
+<span class="chip plain">공정건설지원과</span>        <span class="chip plain">2026-10-07</span>
+      </div>
+      <h2>10.12~12.31 「불법하도급 집중단속 및 자진신고 기간」 운영</h2>
+<div class="one-liner">🔨 공공 건설현장 불법하도급, 연말까지 집중단속 시작됐어요</div>
+      <p class="body-para">국토부가 10개 공공기관과 손잡고 10/12부터 12/31까지 불법하도급 집중단속 기간을 운영 중이에요. AI로 추려낸 공공현장 275곳에 130명 이상을 투입해 점검하고, 신고 포상금도 대폭 강화됐어요. 단속 기간 중 자진신고·시정하면 행정처분을 절반까지 줄여줄 수 있어요.</p>
+
+      <div class="kp-grid">
+        <div class="kp">
+          <div class="label">단속 기간</div>
+          <div class="value">10/12 - 12/31</div>
+        </div>
+        <div class="kp">
+          <div class="label">점검 현장 수</div>
+          <div class="value">공공현장 275곳</div>
+        </div>
+        <div class="kp">
+          <div class="label">투입 인력</div>
+          <div class="value">최소 130명 이상</div>
+        </div>
+        <div class="kp">
+          <div class="label">신고 포상금</div>
+          <div class="value">과징금 10억 부과 시 최대 3억원</div>
+        </div>
+      </div>
+
+      <div class="callout idea"><b class="tag">🐰 래빗해빛 해석</b>건설 관련 주식이나 리츠를 보유하고 있다면, 이런 단속 강화가 하도급 비용 구조에 영향을 줄 수 있어요. 직접적인 수혜·피해보다는 공사 지연 리스크를 눈여겨볼 필요가 있어요.</div>
+      <div class="check-line">📌 <b>원문에서 확인!</b> 자진신고 감경이 실제 행정처분에 적용되는 구체적 요건과 절차, 그리고 신고 접수 채널을 원문에서 확인해보세요.</div>
+
+      <div class="cta-row">
+        <a class="cta" href="https://www.molit.go.kr/USR/NEWS/m_71/dtl.jsp?lcmspage=1&id=95092484" target="_blank" rel="noopener">📄 원문 읽기</a>
+<a class="cta-sub" href="https://www.molit.go.kr/LCMS/DWN.jsp?fold=koreaNews/mobile/file&fileName=261008%28%EC%A1%B0%EA%B0%84%29+10.12%7E12.31+%E3%80%8C%EB%B6%88%EB%B2%95%ED%95%98%EB%8F%84%EA%B8%89+%EC%A7%91%EC%A4%91%EB%8B%A8%EC%86%8D+%EB%B0%8F+%EC%9E%90%EC%A7%84%EC%8B%A0%EA%B3%A0+%EA%B8%B0%EA%B0%84%E3%80%8D+%EC%9A%B4%EC%98%81%28%EA%B3%B5%EC%A0%95%EA%B1%B4%EC%84%A4%EC%A7%80%EC%9B%90%EA%B3%BC%29.pdf" target="_blank" rel="noopener">PDF 내려받기 ↓</a>      </div>
+    </article>
+
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    <div class="logo-text">부자습관은 래빗해빛 🐰</div>
+    <p>햇님이들을 위한 이번주 국토부 정책 소식 🌞</p>
+    <p>
+      <a href="https://www.youtube.com/@rabbit._.habbit" target="_blank" rel="noopener">유튜브</a> ·
+      <a href="https://www.instagram.com/rabbit._.habbit/" target="_blank" rel="noopener">인스타그램</a>
+    </p>
+    <p class="disclaimer">본 보고서는 국토부 보도자료의 요약본이며, 투자 판단의 근거가 될 수 없습니다.</p>
+    <div class="attribution">출처: 국토교통부 보도자료 (공공누리 자유이용)</div>
+  </div>
+</footer>
+</body>
+</html>
