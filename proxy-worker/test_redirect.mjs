@@ -85,12 +85,45 @@ console.log("\n[제휴 링크가 원문 그대로 나가는가 - 수수료가 �
     book: "https://link.yes24.com/a/LdOL9rzKu3",
     taling: "https://www.taling.me/mkt/rabbit_2",
     mf_kakao: "https://pf.kakao.com/_RBZrX/friend",
+    mf_sale: "https://moneyfreelab2026.imweb.me/shop/?idx=1",
+    mf_wait2: "https://pf.kakao.com/_RBZrX/friend",
   };
   for (const [p, want] of Object.entries(EXPECT)) {
     const rr = await worker.fetch(req(`${B}/r?p=${p}&s=ladder&v=base&a=link`, { "user-agent": "Safari" }), env, ctx);
     const loc = rr.headers.get("location") || "";
     check(`${p}: 주소 한 글자도 안 바뀜`, loc === want, loc);
   }
+}
+
+console.log("\n[변종 코드 c<N> - 문구 풀 인덱스가 정상값으로 인정되는가]");
+{
+  // 2026-09-28~10-26 사이 27클릭 전부가 ok=0이었다. 파이프라인은 c0·c1…을
+  // 보내는데 허용 목록에 base·e01a만 있었다. 지면·각도는 맞고 변종만
+  // 어긋나서, 합계는 정상인데 전부 불량으로 보이는 모양이 됐다.
+  for (const v of ["c0", "c9", "c10", "base", "e01a", "e12b"]) {
+    rows.length = 0;
+    const rr = await worker.fetch(req(`${B}/r?p=book&s=ladder&v=${v}&a=role`, { "user-agent": "Safari" }), env, ctx);
+    await new Promise((x) => setTimeout(x, 10));
+    check(`v=${v} → ok=1`, rows[0] && rows[0].args[6] === 1, JSON.stringify(rows[0] && rows[0].args));
+  }
+  for (const v of ["c", "c100", "cx", "d0", ""]) {
+    rows.length = 0;
+    await worker.fetch(req(`${B}/r?p=book&s=ladder&v=${v}&a=role`, { "user-agent": "Safari" }), env, ctx);
+    await new Promise((x) => setTimeout(x, 10));
+    check(`v=${JSON.stringify(v)} → ok=0 (허용값을 넓히다 아무거나 통과시키면 안 된다)`,
+          rows[0] && rows[0].args[6] === 0, JSON.stringify(rows[0] && rows[0].args));
+  }
+}
+
+console.log("\n[mf_wait2와 mf_sale은 별개 계열이다]");
+{
+  const a = await worker.fetch(req(`${B}/r?p=mf_sale&s=ladder&v=c0&a=role`, { "user-agent": "Safari" }), env, ctx);
+  const b = await worker.fetch(req(`${B}/r?p=mf_wait2&s=ladder&v=c0&a=ask`, { "user-agent": "Safari" }), env, ctx);
+  // 1기 마감 뒤에도 mf_sale의 목적지는 그대로 둔다. 지난 아카이브의 링크가
+  // 이 코드를 가리키고 있어서, 목적지를 갈면 과거 클릭의 뜻이 바뀐다.
+  check("mf_sale은 여전히 1기 신청 페이지", (a.headers.get("location") || "").includes("imweb"));
+  check("mf_wait2는 카톡 채널", (b.headers.get("location") || "").includes("pf.kakao.com"));
+  check("둘의 목적지가 다르다", a.headers.get("location") !== b.headers.get("location"));
 }
 
 console.log("\n[이미지 경로]");

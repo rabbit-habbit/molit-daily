@@ -196,8 +196,17 @@ const R_DEST = {
 
   taling: "https://www.taling.me/mkt/rabbit_2",
 
-  // TODO(대표님): 모집 개시 후 결제 페이지 주소를 받으면 교체한다.
-  mf_sale: "https://PLACEHOLDER/moneyfreelab",
+  // 머니프리랩 1기 신청 페이지 (2026-10-20 모집 개시).
+  // mf_kakao(무료 채널 추가)와 계열을 절대 합치지 않는다. 무료 클릭률과
+  // 유료 신청 클릭률이 섞이면 전환 시점에 "성과가 반토막 났다"가 나온다.
+  mf_sale: "https://moneyfreelab2026.imweb.me/shop/?idx=1",
+
+  // 머니프리랩 2기 오픈 알림 대기 (2026-11-02 교체). 1기 마감으로 유료
+  // 신청에서 무료 대기로 내려왔다. 목적지는 mf_kakao와 같은 카톡 채널인데
+  // 코드를 따로 파는 이유가 있다. mf_kakao는 1기 "출시 전" 사전 알림이고
+  // 이건 1기를 치른 뒤의 2기 대기라, 한 코드에 담으면 그 숫자가 어느
+  // 캠페인 것인지 날짜를 외워야만 읽힌다.
+  mf_wait2: "https://pf.kakao.com/_RBZrX/friend",
 };
 
 // 허용값. 여기 없는 값이 오면 목적지는 정상 처리하되 ok=0으로 남겨
@@ -212,7 +221,10 @@ const R_SLOTS = new Set(["ladder", "article_n"]);
 // 각도는 상시 블록이 셋을 한 번에 보여주는 구조라 의미가 줄었지만,
 // 트리거 블록이 어떤 맥락으로 붙었는지는 계속 구분한다.
 const R_ANGLES = new Set(["role", "link", "ask", "quote"]);
-const R_VARIANT_RE = /^(base|e\d{2}[ab])$/;
+// v는 두 종류다. c<N>은 문구 풀의 몇 번째 문장인지(상시), e01a 같은
+// 코드는 A/B 실험용이다. base는 실험 없는 기준선.
+// 풀이 10~11개라 두 자리까지 받는다.
+const R_VARIANT_RE = /^(base|c\d{1,2}|e\d{2}[ab])$/;
 
 const R_BOT_RE = /bot|crawler|spider|crawling|preview|fetch|monitor|slurp|curl|wget|headless|python-requests|okhttp|facebookexternalhit|whatsapp|telegram|kakaotalk-scrap/i;
 
