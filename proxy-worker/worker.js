@@ -119,7 +119,41 @@ const BRIEF_ERROR_PAGE = (title, msg) => `<!DOCTYPE html>
   <p style="color:#64716B;font-size:14.5px;line-height:1.7;">${msg}</p>
 </div></body></html>`;
 
-async function serveBrief(reqUrl, env) {
+// ── 링크 미리보기 (카톡 OG 카드) ──────────────────────────────────────
+// 브리핑에는 og:image가 없었다. 그러면 카카오가 본문에서 이미지를 긁어가는데,
+// 잡히는 게 사다리 썸네일(책 표지)이다. 2026-11-13 공지방에 그 상태로 나갔다.
+//
+// "미리보기 사진을 없애달라"는 요청이라 og:image를 **넣지 않는다.** 다만 태그만
+// 빼면 카카오가 다시 본문을 긁으므로, 미리보기 봇에게는 이미지가 한 장도 없는
+// 최소 문서를 따로 준다. 그래야 글자만 있는 카드가 확실히 나온다.
+// 봇은 콘텐츠를 볼 필요가 없고, 서명·만료 검증은 이미 통과한 뒤다.
+const PREVIEW_BOTS = /kakaotalk-scrap|kakaostory-scrap|facebookexternalhit|twitterbot|slackbot|discordbot|telegrambot|whatsapp|linkedinbot|skypeuripreview|embedly|bingpreview/i;
+
+const BRIEF_PREVIEW_META = {
+  k: { title: "래빗해빛 경제 브리핑", desc: "오늘의 경제지표와 꼭 알아야 할 뉴스를 한 번에." },
+  m: { title: "래빗해빛 정책 브리핑", desc: "이번 주 부동산·정책 소식을 한 번에." },
+  e: { title: "래빗해빛 정책 브리핑", desc: "이번 주 부동산·정책 소식을 한 번에." },
+};
+
+function briefPreviewPage(app, date) {
+  const meta = BRIEF_PREVIEW_META[app] || BRIEF_PREVIEW_META.k;
+  const [, mm, dd] = date.split("-");
+  const title = `${meta.title} (${Number(mm)}/${Number(dd)})`;
+  // og:image를 의도적으로 넣지 않는다. <img>도 한 장도 두지 않는다.
+  return `<!DOCTYPE html>
+<html lang="ko"><head><meta charset="utf-8">
+<title>${title}</title>
+<meta name="description" content="${meta.desc}">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="래빗해빛">
+<meta property="og:title" content="${title}">
+<meta property="og:description" content="${meta.desc}">
+<meta name="twitter:card" content="summary">
+<meta name="robots" content="noindex, nofollow">
+</head><body><h1>${title}</h1><p>${meta.desc}</p></body></html>`;
+}
+
+async function serveBrief(reqUrl, env, request) {
   const m = reqUrl.pathname.match(/^\/brief\/([kme])\/(\d{4}-\d{2}-\d{2})$/);
   if (!m) return new Response(BRIEF_ERROR_PAGE("잘못된 주소예요", "받으신 링크를 그대로 눌러주세요."), {
     status: 404, headers: { "content-type": "text/html; charset=utf-8" },
@@ -136,6 +170,17 @@ async function serveBrief(reqUrl, env) {
   if (Date.now() / 1000 > Number(e)) {
     return new Response(BRIEF_ERROR_PAGE("링크 유효기간이 지났어요", "지난 브리핑은 publ 앱의 아티클에서<br>언제든 다시 보실 수 있어요 🐰"), {
       status: 410, headers: { "content-type": "text/html; charset=utf-8" },
+    });
+  }
+
+  // 미리보기 봇은 여기서 끝낸다. 본문을 주지 않으므로 긁어갈 이미지가 없다.
+  if (PREVIEW_BOTS.test(request.headers.get("user-agent") || "")) {
+    return new Response(briefPreviewPage(app, date), {
+      headers: {
+        "content-type": "text/html; charset=utf-8",
+        "cache-control": "public, max-age=600",
+        "x-robots-tag": "noindex, nofollow, noarchive",
+      },
     });
   }
 
@@ -458,7 +503,7 @@ export default {
 
     // 유료 브리핑 서명 링크 (멤버십 채팅방용 · 공개 경로)
     if (reqUrl.pathname.startsWith("/brief/") && request.method === "GET") {
-      return serveBrief(reqUrl, env);
+      return serveBrief(reqUrl, env, request);
     }
 
     if (request.method !== "GET") {
