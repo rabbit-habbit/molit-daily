@@ -133,7 +133,11 @@ def fetch_list_page(session: requests.Session, page: int) -> list[PostRow]:
             )
         )
     if not rows:
-        logger.warning("page %d: 파싱된 행 없음 (레이아웃 변경 가능성) num=%s", page, num)
+        # 주의: 루프 변수(num 등)는 행이 0개면 정의되지 않는다 - 본문 길이로 진단
+        logger.warning(
+            "page %d: 파싱된 행 없음 (빈 응답 또는 레이아웃 변경, 본문 %d bytes)",
+            page, len(r.text),
+        )
     return rows
 
 

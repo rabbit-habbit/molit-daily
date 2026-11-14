@@ -20,6 +20,7 @@ import logging
 import os
 import re
 import subprocess
+import time
 import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -177,9 +178,19 @@ def run(
     # 1) 목록 스캔 (min_date보다 오래된 페이지에서 조기 종료)
     logger.info("[1/4] 보도자료 목록 스캔 중...")
     session = molit_client.make_session()
-    rows = molit_client.scan_pages(session, pages, min_date=min_date)
+    # 이른 아침 WAF·점검으로 목록이 일시적으로 비어 오는 경우가 있어
+    # (2026-11-14 08:37 실측) 빈 결과는 90초 간격으로 2회 더 재시도한다.
+    rows = []
+    for attempt in range(3):
+        rows = molit_client.scan_pages(session, pages, min_date=min_date)
+        if rows:
+            break
+        if attempt < 2:
+            logger.warning("  목록이 비어 있음 - 90초 후 재시도 (%d/3)", attempt + 1)
+            time.sleep(90)
+            session = molit_client.make_session()  # WAF 쿠키 재발급
     if not rows:
-        raise RuntimeError("목록을 하나도 읽지 못했습니다 (사이트 구조 변경/차단 의심)")
+        raise RuntimeError("목록을 하나도 읽지 못했습니다 (3회 모두 빈 응답 - 사이트 구조 변경/차단 의심)")
     max_views = max(r.views for r in rows)
     logger.info("  ✓ %d건 스캔 (최고 조회수 %s회)", len(rows), f"{max_views:,}")
 
