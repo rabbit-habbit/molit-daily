@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>이번 주 핫한 국토부 정책 - 2026년 11월 14일 토요일</title>
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F7FAF7;
+    --text: #24302A;
+    --text-sub: #64716B;
+    --accent: #1B7A4B;
+    --accent-light: #E8F5EE;
+    --amber: #B45309;
+    --amber-light: #FFF7E6;
+    --border: #E2EAE4;
+    --card: #FFFFFF;
+    --rabbit-orange: #FF6B35;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: 'Pretendard Variable', 'Pretendard', -apple-system, sans-serif;
+    background: var(--bg); color: var(--text); line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+  .container { max-width: 680px; margin: 0 auto; padding: 0 20px; }
+
+  header {
+    background: linear-gradient(135deg, #DCF2E4 0%, #BFE6CE 55%, #A5DBBC 100%);
+    padding: 40px 0 32px; position: relative; overflow: hidden;
+  }
+  header::before {
+    content: '🏗️'; position: absolute; bottom: 28px; right: 56px;
+    font-size: 64px; opacity: 0.25;
+  }
+  header::after {
+    content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 4px;
+    background: linear-gradient(90deg, var(--accent), var(--rabbit-orange));
+  }
+  .brand {
+    font-size: 12.5px; letter-spacing: 0.5px;
+    color: rgba(20,60,40,0.7); font-weight: 700;
+  }
+  h1 { font-size: 24px; font-weight: 800; margin-top: 8px; }
+  .header-date { color: rgba(20,60,40,0.75); font-size: 14px; margin-top: 4px; }
+  .header-note {
+    display:inline-block; margin-top: 14px; padding: 5px 12px;
+    background: rgba(255,255,255,0.65); border-radius: 999px;
+    font-size: 12.5px; color: #1F5138; font-weight: 600;
+  }
+
+  main { padding: 28px 0 12px; }
+
+  .intro {
+    background: var(--card); border: 1.5px solid var(--accent);
+    border-radius: 16px; padding: 20px 22px; margin-bottom: 24px;
+    font-size: 14px;
+  }
+  .intro .intro-title { font-weight: 800; font-size: 15px; margin-bottom: 8px; }
+  .intro p { margin-top: 6px; }
+  .intro .highlight { color: var(--accent); font-weight: 700; }
+
+  .card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 16px; padding: 24px; margin-bottom: 20px;
+    box-shadow: 0 1px 3px rgba(20,48,35,0.05);
+  }
+  .card-meta {
+    display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px;
+    font-size: 12px; color: var(--text-sub);
+  }
+  .chip {
+    padding: 2px 10px; border-radius: 999px; background: var(--accent-light);
+    color: var(--accent); font-weight: 600;
+  }
+  .chip.views { background: var(--amber-light); color: var(--amber); }
+  .chip.plain { background: #F1F4F1; color: var(--text-sub); font-weight: 500; }
+  .card h2 { font-size: 18px; font-weight: 700; line-height: 1.45; }
+  .one-liner {
+    margin-top: 8px; font-size: 14.5px; font-weight: 600; color: var(--accent);
+  }
+  .card p.body-para { margin-top: 12px; font-size: 14.5px; }
+
+  .kp-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 8px; margin-top: 16px;
+  }
+  .kp {
+    background: #F6F9F6; border: 1px solid var(--border); border-radius: 10px;
+    padding: 10px 12px;
+  }
+  .kp .label { font-size: 11.5px; color: var(--text-sub); }
+  .kp .value { font-size: 14px; font-weight: 700; margin-top: 2px; }
+
+  .callout {
+    margin-top: 14px; padding: 12px 14px; border-radius: 10px; font-size: 13.5px;
+  }
+  .callout.idea { background: #FFF3EE; }
+  .callout b.tag { display:block; font-size: 12px; margin-bottom: 3px; }
+  .callout.idea b.tag { color: var(--rabbit-orange); }
+
+  .check-line {
+    margin-top: 12px; font-size: 13px; color: var(--amber);
+  }
+  .check-line b { font-weight: 700; }
+
+  .cta-row { margin-top: 16px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .cta {
+    display: inline-block; padding: 10px 18px; border-radius: 10px;
+    background: var(--accent); color: #fff !important; font-weight: 700;
+    font-size: 14px; text-decoration: none;
+  }
+  .cta:hover { opacity: 0.9; }
+  .cta-sub {
+    font-size: 13px; color: var(--text-sub); text-decoration: none; font-weight: 600;
+  }
+  .cta-sub:hover { text-decoration: underline; }
+
+  .empty {
+    text-align: center; padding: 48px 20px; color: var(--text-sub); font-size: 14px;
+  }
+
+  .promo {
+    margin-top: 28px; padding: 22px 24px; border-radius: 16px;
+    background: linear-gradient(135deg, #FFF3EE 0%, #FFE8DC 100%);
+    border: 1.5px solid var(--rabbit-orange); font-size: 14px;
+  }
+  .promo-title { font-size: 16px; font-weight: 800; margin-bottom: 8px; }
+  .promo-cta { text-align: center; margin-top: 16px; }
+  .promo .cta { background: var(--rabbit-orange); }
+
+  footer {
+    padding: 24px 0 48px; text-align: center;
+    font-size: 13px; color: var(--text-sub);
+  }
+  footer .logo-text { font-size: 16px; font-weight: 800; color: var(--text); }
+  footer p { margin-top: 8px; }
+  footer a { color: var(--rabbit-orange); font-weight: 700; text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+  footer .disclaimer { opacity: 0.55; }
+  footer .attribution { margin-top: 16px; font-size: 10.5px; opacity: 0.4; }
+</style>
+</head>
+<body>
+<header>
+  <div class="container">
+    <div class="brand">햇님이들을 위한 이번주 정책 브리핑</div>
+    <h1>🏗️ 이번 주 핫한 국토부 정책</h1>
+    <div class="header-date">2026년 11월 14일 토요일</div>
+    <div class="header-note">이번 주 화제 보도 5건</div>
+  </div>
+</header>
+
+<main>
+  <div class="container">
+    <div class="intro">
+      <div class="intro-title">🐰 시작 전에, 햇님이들!</div>
+      <p>제가 항상 강조하는 거 기억하시죠? <span class="highlight">"정책은 꼭 원문으로 확인하세요."</span> 원문을 보는 습관을 길러야 내가 주체적으로 해석하는 힘이 생겨요! 기사 한 줄, 요약 한 장으로는 내 상황에 맞는 조건이나 예외가 안 보이거든요.</p>
+      <p>그래서 이 브리핑은 정답지가 아니라 <b>지도</b>예요. 아래에서 가닥만 잡고, 끌리는 소식은 <span class="highlight">[원문 읽기] 버튼으로 바로 국토부 보도자료를 직접</span> 보실 수 있어요 📄</p>
+    </div>
+    <article class="card">
+      <div class="card-meta">
+        <span class="chip">주택토지</span>
+        <span class="chip views">조회 3,598회</span>
+<span class="chip plain">피해지원총괄과</span>        <span class="chip plain">2026-11-09</span>
+      </div>
+      <h2>전세사기피해자 최소보장제 시행, 10일부터 최소지원금 신청하세요!</h2>
+<div class="one-liner">🏠 전세사기 피해자, 보증금 최소 1/3은 국가가 돌려줘요</div>
+      <p class="body-para">11/13부터 &#39;전세사기피해자 최소보장제&#39;가 시행됐어요. 경매 후에도 보증금을 1/3 이상 못 돌려받은 피해자에게 그 차액을 현금으로 지원하고, 신탁사기 등 무권계약 피해자는 경·공매가 끝나기 전에도 보증금의 1/3을 먼저 받을 수 있어요. LH 청약플러스(apply.lh.or.kr) 온라인 신청은 11/10에 이미 시작됐고, 현장 접수는 11/13부터 LH 지역본부에서 가능해요.</p>
+
+      <div class="kp-grid">
+        <div class="kp">
+          <div class="label">최소 보장 수준</div>
+          <div class="value">임차보증금의 1/3 (예: 보증금 1억 → 최대 3,333만원)</div>
+        </div>
+        <div class="kp">
+          <div class="label">온라인 신청 개시</div>
+          <div class="value">11/10부터 LH 청약플러스</div>
+        </div>
+        <div class="kp">
+          <div class="label">현장 접수 개시</div>
+          <div class="value">11/13부터 LH 지역본부</div>
+        </div>
+        <div class="kp">
+          <div class="label">지급 결정 기한</div>
+          <div class="value">신청일로부터 90일 이내 (보완 필요 시 30일 연장)</div>
+        </div>
+      </div>
+
+      <div class="callout idea"><b class="tag">🐰 래빗해빛 해석</b>전세사기 피해자라면 꼭 챙겨야 할 제도예요. 제도 시행 전에 이미 경·공매가 끝난 피해자도 신청할 수 있고, 11/13부터 3년('29.11.13)까지 신청 기간이 열려 있으니 주변에 해당자가 있다면 꼭 알려주세요.</div>
+      <div class="check-line">📌 <b>원문에서 확인!</b> 내가 지원 대상인지 헷갈린다면 원문 Q&A의 '지원 제외 대상 4가지'와 유형별 신청 시기표를 확인하세요.</div>
+
+      <div class="cta-row">
+        <a class="cta" href="https://www.molit.go.kr/USR/NEWS/m_71/dtl.jsp?lcmspage=1&id=95092572" target="_blank" rel="noopener">📄 원문 읽기</a>
+<a class="cta-sub" href="https://www.molit.go.kr/LCMS/DWN.jsp?fold=koreaNews/mobile/file&fileName=261110%28%EC%A1%B0%EA%B0%84%29_%EC%A0%84%EC%84%B8%EC%82%AC%EA%B8%B0%ED%94%BC%ED%95%B4%EC%9E%90_%EC%B5%9C%EC%86%8C%EB%B3%B4%EC%9E%A5%EC%A0%9C_%EC%8B%9C%ED%96%89__10%EC%9D%BC%EB%B6%80%ED%84%B0_%EC%B5%9C%EC%86%8C%EC%A7%80%EC%9B%90%EA%B8%88_%EC%8B%A0%EC%B2%AD%ED%95%98%EC%84%B8%EC%9A%94%28%ED%94%BC%ED%95%B4%EC%A7%80%EC%9B%90%EC%B4%9D%EA%B4%84%EA%B3%BC%29.pdf" target="_blank" rel="noopener">PDF 내려받기 ↓</a>      </div>
+    </article>
+    <article class="card">
+      <div class="card-meta">
+        <span class="chip">주택토지</span>
+        <span class="chip views">조회 2,933회</span>
+<span class="chip plain">주택기금과</span>        <span class="chip plain">2026-11-10</span>
+      </div>
+      <h2>부정청약 관계부처 합동점검 결과</h2>
+<div class="one-liner">🚨 부정청약 354건 적발, 위장전입·위장미혼까지 전부 수사 의뢰</div>
+      <p class="body-para">국토부와 국무조정실이 &#39;25.7~&#39;26.3 분양한 43개 단지 2.5만 세대 당첨자를 합동 점검한 결과, 부정청약 의심 354건을 적발했어요. 위장전입(334건)이 압도적으로 많았고, 위장미혼·위장퇴사·자격매매까지 다양한 수법이 걸렸어요. 적발된 사례는 전부 수사 의뢰될 예정이에요.</p>
+
+      <div class="kp-grid">
+        <div class="kp">
+          <div class="label">총 적발 건수</div>
+          <div class="value">354건 (43개 단지 2.5만 세대 대상)</div>
+        </div>
+        <div class="kp">
+          <div class="label">유형별 1위</div>
+          <div class="value">위장전입 334건 - 전체의 약 94%</div>
+        </div>
+        <div class="kp">
+          <div class="label">이전 점검 대비</div>
+          <div class="value">'25년 상반기 2.8만 호 252건 → 이번 2.5만 호 354건으로 증가</div>
+        </div>
+        <div class="kp">
+          <div class="label">확정 시 처벌</div>
+          <div class="value">징역 3년 또는 벌금 3천만 원 + 계약 취소 + 10년 청약 자격 제한</div>
+        </div>
+      </div>
+
+      <div class="callout idea"><b class="tag">🐰 래빗해빛 해석</b>청약 가점 쌓는 게 얼마나 어려운지 아는데, 그 자리를 이런 식으로 가져간 사람들이 적지 않았던 거예요. 직장 소재지·전월세 내역까지 뒤지는 조사기법이 강화됐으니, 앞으로 가족 주소 관련 애매한 상황이 있다면 지금이라도 꼭 점검해 보세요.</div>
+      <div class="check-line">📌 <b>원문에서 확인!</b> 위장전입·위장미혼·위장퇴사 등 유형별 구체 적발 사례와 조사 근거 자료(건강보험 요양급여내역, RTMS 임대차계약내역 등)를 원문에서 직접 확인해 보세요.</div>
+
+      <div class="cta-row">
+        <a class="cta" href="https://www.molit.go.kr/USR/NEWS/m_71/dtl.jsp?lcmspage=1&id=95092578" target="_blank" rel="noopener">📄 원문 읽기</a>
+<a class="cta-sub" href="https://www.molit.go.kr/LCMS/DWN.jsp?fold=koreaNews/mobile/file&fileName=261110%28%EB%B3%B4%EB%8F%84%EC%9E%90%EB%A3%8C%29+%EB%B6%80%EC%A0%95%EC%B2%AD%EC%95%BD+%EA%B4%80%EA%B3%84%EB%B6%80%EC%B2%98+%ED%95%A9%EB%8F%99%EC%A0%90%EA%B2%80+%EA%B2%B0%EA%B3%BC%28%EC%A3%BC%ED%83%9D%EA%B8%B0%EA%B8%88%EA%B3%BC%29.pdf" target="_blank" rel="noopener">PDF 내려받기 ↓</a>      </div>
+    </article>
+    <article class="card">
+      <div class="card-meta">
+        <span class="chip">주택토지</span>
+        <span class="chip views">조회 2,003회</span>
+<span class="chip plain">주택정비정책과</span>        <span class="chip plain">2026-11-12</span>
+      </div>
+      <h2>공공재개발 사업수수료 3%→1% 한시 인하</h2>
+<div class="one-liner">🏘️ 공공재개발 수수료 3%→1%, 구역당 130억 절감</div>
+      <p class="body-para">국토부와 LH가 공공재개발 사업수수료율을 총 사업비의 3%에서 1%로 한시 인하했어요. &#39;27년 12월 31일까지 새로 후보지 신청을 하는 구역에 적용되고, 기존 국비 지원(수수료의 최대 15%)도 그대로 유지돼요. 국비 지원까지 합치면 실제 부담 수수료는 사업비의 0.85% 수준까지 낮아져요.</p>
+
+      <div class="kp-grid">
+        <div class="kp">
+          <div class="label">수수료율 인하</div>
+          <div class="value">총 사업비의 3% → 1% (한시)</div>
+        </div>
+        <div class="kp">
+          <div class="label">적용 신청 기한</div>
+          <div class="value">'27년 12월 31일까지 신규 후보지 신청 구역</div>
+        </div>
+        <div class="kp">
+          <div class="label">구역당 평균 절감액</div>
+          <div class="value">약 130억원</div>
+        </div>
+        <div class="kp">
+          <div class="label">국비 지원 반영 시 실부담</div>
+          <div class="value">사업비의 0.85% 수준</div>
+        </div>
+      </div>
+
+      <div class="callout idea"><b class="tag">🐰 래빗해빛 해석</b>재개발 추진이 더뎠던 구역 입장에선 비용 부담이 꽤 줄어드는 소식이에요. 공공재개발 후보지가 늘어나면 중장기적으로 도심 주택 공급량에도 영향을 줄 수 있어서, 해당 구역 주변 집값 흐름을 눈여겨볼 만해요.</div>
+      <div class="check-line">📌 <b>원문에서 확인!</b> 민간재개발 대비 공공재개발 혜택 비교표(용적률·이차보전·동의요건 등)와 LH 사전 컨설팅 신청 절차를 원문에서 직접 확인해 보세요.</div>
+
+      <div class="cta-row">
+        <a class="cta" href="https://www.molit.go.kr/USR/NEWS/m_71/dtl.jsp?lcmspage=1&id=95092589" target="_blank" rel="noopener">📄 원문 읽기</a>
+<a class="cta-sub" href="https://www.molit.go.kr/LCMS/DWN.jsp?fold=koreaNews/mobile/file&fileName=261113%28%EC%A1%B0%EA%B0%84%29+%EA%B3%B5%EA%B3%B5%EC%9E%AC%EA%B0%9C%EB%B0%9C+%EC%82%AC%EC%97%85%EC%88%98%EC%88%98%EB%A3%8C+3%ED%8D%BC%EC%84%BC%ED%8A%B8%E2%86%921%ED%8D%BC%EC%84%BC%ED%8A%B8+%ED%95%9C%EC%8B%9C+%EC%9D%B8%ED%95%98%28%EC%A3%BC%ED%83%9D%EC%A0%95%EB%B9%84%EC%A0%95%EC%B1%85%EA%B3%BC%29.pdf" target="_blank" rel="noopener">PDF 내려받기 ↓</a>      </div>
+    </article>
+    <article class="card">
+      <div class="card-meta">
+        <span class="chip">도로철도</span>
+        <span class="chip views">조회 3,899회</span>
+<span class="chip plain">철도정책과</span>        <span class="chip plain">2026-11-08</span>
+      </div>
+      <h2>새로운 대한민국의 내일을 잇는 철도 대전환, 국민과 함께 그립니다</h2>
+<div class="one-liner">🚆 2026~2035 국가철도망 계획, 의견수렴 행사가 열렸어요</div>
+      <p class="body-para">국토교통부가 11/13 서울 전문건설회관에서 &#39;제5차 국가철도망 구축계획(2026~2035)&#39; 의견수렴 행사를 열었어요. 지방정부 의견 발표, 전문가 토론, 국민 댓글 수렴 순으로 진행됐고, 국토교통부 유튜브로도 생중계됐어요. 사전 설문조사는 11/8~13 운영됐으며, 이번에 모인 의견들이 향후 10년 철도망 계획 수립에 반영될 예정이에요.</p>
+
+      <div class="kp-grid">
+        <div class="kp">
+          <div class="label">계획 기간</div>
+          <div class="value">2026~2035년 (10년)</div>
+        </div>
+        <div class="kp">
+          <div class="label">행사 일시</div>
+          <div class="value">11/13(금) 09:30 - 서울 전문건설회관</div>
+        </div>
+        <div class="kp">
+          <div class="label">사전 설문 기간</div>
+          <div class="value">11/8~11/13 (마감됨)</div>
+        </div>
+        <div class="kp">
+          <div class="label">주요 논의 과제</div>
+          <div class="value">3대 메가프로젝트 연계, 주택공급 맞춤 철도 확충, 병목구간 개선</div>
+        </div>
+      </div>
+
+      <div class="callout idea"><b class="tag">🐰 래빗해빛 해석</b>10년치 철도 노선이 이번 계획으로 사실상 확정되는 거예요. 내가 사는 동네에 철도가 들어오느냐 아니냐가 집값에 직결되는 만큼, 어떤 노선이 반영되는지 고시 결과를 꼭 챙겨봐야 해요.</div>
+      <div class="check-line">📌 <b>원문에서 확인!</b> 원문에서 '3대 메가프로젝트'가 구체적으로 무엇인지, 그리고 지역별로 어떤 사업이 건의됐는지 확인해보세요.</div>
+
+      <div class="cta-row">
+        <a class="cta" href="https://www.molit.go.kr/USR/NEWS/m_71/dtl.jsp?lcmspage=1&id=95092569" target="_blank" rel="noopener">📄 원문 읽기</a>
+<a class="cta-sub" href="https://www.molit.go.kr/LCMS/DWN.jsp?fold=koreaNews/mobile/file&fileName=261109%28%EC%A1%B0%EA%B0%84%29+%EC%83%88%EB%A1%9C%EC%9A%B4+%EB%8C%80%ED%95%9C%EB%AF%BC%EA%B5%AD%EC%9D%98+%EB%82%B4%EC%9D%BC%EC%9D%84+%EC%9E%87%EB%8A%94+%EC%B2%A0%EB%8F%84+%EB%8C%80%EC%A0%84%ED%99%98++%EA%B5%AD%EB%AF%BC%EA%B3%BC+%ED%95%A8%EA%BB%98+%EA%B7%B8%EB%A6%BD%EB%8B%88%EB%8B%A4%28%EC%B2%A0%EB%8F%84%EC%A0%95%EC%B1%85%EA%B3%BC%29.pdf" target="_blank" rel="noopener">PDF 내려받기 ↓</a>      </div>
+    </article>
+    <article class="card">
+      <div class="card-meta">
+        <span class="chip">건설</span>
+        <span class="chip views">조회 3,872회</span>
+<span class="chip plain">녹색건축과</span>        <span class="chip plain">2026-11-05</span>
+      </div>
+      <h2>다세대·오피스텔 층간소음 차단 기준 강화</h2>
+<div class="one-liner">🏠 다세대·오피스텔 층간소음 기준, 드디어 아파트 수준으로 올라가요</div>
+      <p class="body-para">국토부가 다세대주택·오피스텔 등의 층간소음 차단 기준을 강화하는 개정안을 11/6부터 행정예고(~11/26)했어요. 그동안 「주택법」 적용 아파트보다 느슨했던 「건축법」 대상 건물의 기준을 중량·경량충격음 모두 49dB 이하로 맞추는 게 핵심이에요.</p>
+
+      <div class="kp-grid">
+        <div class="kp">
+          <div class="label">행정예고 기간</div>
+          <div class="value">11/6~11/26</div>
+        </div>
+        <div class="kp">
+          <div class="label">현행 기준</div>
+          <div class="value">중량충격음 50dB 이하, 경량충격음 58dB 이하</div>
+        </div>
+        <div class="kp">
+          <div class="label">강화 기준</div>
+          <div class="value">중량·경량충격음 모두 49dB 이하</div>
+        </div>
+        <div class="kp">
+          <div class="label">적용 대상</div>
+          <div class="value">다세대주택, 30세대 미만 공동주택, 오피스텔</div>
+        </div>
+      </div>
+
+      <div class="callout idea"><b class="tag">🐰 래빗해빛 해석</b>오피스텔·다세대 거주자라면 반길 소식이에요. 특히 경량충격음이 58dB→49dB로 무려 9dB나 강화되는데, dB는 로그 단위라 체감 차이가 꽤 크거든요. 아직 행정예고 단계라 실제 시행까지 시간이 걸리지만, 오피스텔 매수나 임차를 고려 중이라면 향후 신축 기준이 달라진다는 점을 염두에 두세요.</div>
+      <div class="check-line">📌 <b>원문에서 확인!</b> 국토부 누리집 '입법예고·행정예고' 메뉴에서 개정안 전문을 확인하고, 표준바닥구조 세부 기준표와 완충재 품질 기준을 직접 살펴보세요.</div>
+
+      <div class="cta-row">
+        <a class="cta" href="https://www.molit.go.kr/USR/NEWS/m_71/dtl.jsp?lcmspage=1&id=95092562" target="_blank" rel="noopener">📄 원문 읽기</a>
+<a class="cta-sub" href="https://www.molit.go.kr/LCMS/DWN.jsp?fold=koreaNews/mobile/file&fileName=261106%28%EC%A1%B0%EA%B0%84%29+%EB%8B%A4%EC%84%B8%EB%8C%80%C2%B7%EC%98%A4%ED%94%BC%EC%8A%A4%ED%85%94+%EC%B8%B5%EA%B0%84%EC%86%8C%EC%9D%8C+%EC%B0%A8%EB%8B%A8+%EA%B8%B0%EC%A4%80+%EA%B0%95%ED%99%94%28%EB%85%B9%EC%83%89%EA%B1%B4%EC%B6%95%EA%B3%BC%29.pdf" target="_blank" rel="noopener">PDF 내려받기 ↓</a>      </div>
+    </article>
+
+    <div class="promo">
+      <div class="promo-title">🌅 매일 아침이 더 궁금하다면?</div>
+      <p>이 국토부 브리핑은 매주 토요일 1회예요. 그런데 햇님이들, 경제 뉴스는 매일 아침 쏟아지잖아요.
+      그래서 드디어 열었습니다 - <b>출근 전 5분, 그날의 주요 경제뉴스를 래빗해빛 해석과 함께 보내드리는
+      「데일리 경제 브리핑」.</b> 지금 얼리버드로 가장 좋은 조건에 시작하실 수 있어요!</p>
+      <div class="promo-cta"><a class="cta" href="https://app.publr.co/channels/L2NoYW5uZWxzLzIzMDY0/B00001/posts/%ED%8F%AC%EC%8A%A4%ED%8A%B81-744579" target="_blank" rel="noopener">🐰 데일리경제 얼리버드 신청하기</a></div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    <div class="logo-text">부자습관은 래빗해빛 🐰</div>
+    <p>햇님이들을 위한 이번주 국토부 정책 소식 🌞</p>
+    <p>
+      <a href="https://www.youtube.com/@rabbit._.habbit" target="_blank" rel="noopener">유튜브</a> ·
+      <a href="https://www.instagram.com/rabbit._.habbit/" target="_blank" rel="noopener">인스타그램</a>
+    </p>
+    <p class="disclaimer">본 보고서는 국토부 보도자료의 요약본이며, 투자 판단의 근거가 될 수 없습니다.</p>
+    <div class="attribution">출처: 국토교통부 보도자료 (공공누리 자유이용)</div>
+  </div>
+</footer>
+</body>
+</html>
